@@ -16,7 +16,8 @@ public final class CustomFluidCapabilities {
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerItem(
                 Capabilities.FluidHandler.ITEM,
-                (stack, context) -> new CustomFluidContainerHandler(stack, ContainerKind.BUCKET),
+                (stack, context) -> new CompatibleFluidBucketWrapper(
+                        stack, new CustomFluidContainerHandler(stack, ContainerKind.BUCKET)),
                 Items.BUCKET,
                 CustomFluidItems.CUSTOM_FLUID_BUCKET.get());
         event.registerItem(

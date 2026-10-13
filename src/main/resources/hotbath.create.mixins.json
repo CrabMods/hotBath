@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "com.crabmod.hotbath.mixin.create.CreateMixinPlugin",
   "mixins": [
+    "GenericItemFillingMixin",
     "FluidDrainingBehaviourMixin",
     "FluidFillingBehaviourMixin",
     "FluidManipulationBehaviourAccessor",
