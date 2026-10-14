@@ -138,7 +138,8 @@ class CreateCompatContractTest {
     @Test
     void dynamicCustomFluidCreateContractIsExplicit() throws IOException {
         String helper = read("src/main/java/com/crabmod/hotbath/custom_fluid/CustomFluidStackHelper.java");
-        String capabilities = read("src/main/java/com/crabmod/hotbath/custom_fluid/CustomFluidCapabilities.java");
+        String capabilities = read("src/main/java/com/crabmod/hotbath/custom_fluid/CustomFluidCapabilities.java")
+                + read("src/main/java/com/crabmod/hotbath/custom_fluid/CompatibleFluidBucketWrapper.java");
         String context = read("src/main/java/com/crabmod/hotbath/custom_fluid/CustomFluidStackContext.java");
         String fillingMixin = read("src/main/java/com/crabmod/hotbath/mixin/create/FluidFillingBehaviourMixin.java");
         String drainingMixin = read("src/main/java/com/crabmod/hotbath/mixin/create/FluidDrainingBehaviourMixin.java");
