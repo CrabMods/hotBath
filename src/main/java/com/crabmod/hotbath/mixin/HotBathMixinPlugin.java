@@ -15,7 +15,7 @@ import java.util.Set;
  * Mixin plugin that checks for compatibility mode before loading mixins.
  * 
  * Config Priority:
- * 1. compatibilityMode = true -> ALL mixins disabled (except FishingHookMixin)
+ * 1. compatibilityMode = true -> advanced mixins disabled; core capability and fishing rules remain active
  * 
  * This reads the config file directly since Forge config is not available at mixin load time.
  */
@@ -115,8 +115,8 @@ public class HotBathMixinPlugin implements IMixinConfigPlugin {
             simpleName = mixinClassName.substring(lastDot + 1);
         }
         
-        // FishingHookMixin is always allowed - it just prevents fishing in bath water
-        if (simpleName.equals("FishingHookMixin")) {
+        // Core bucket capabilities and fishing rules remain active independently of advanced integrations
+        if ((simpleName.equals("FishingHookMixin") || simpleName.equals("EmptyBucketCapabilityMixin"))) {
             return true;
         }
         
