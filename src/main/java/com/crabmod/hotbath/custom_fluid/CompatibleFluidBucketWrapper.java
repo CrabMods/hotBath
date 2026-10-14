@@ -1,88 +1,51 @@
 package com.crabmod.hotbath.custom_fluid;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
 
-/**
- * Keeps ordinary bucket operations on NeoForge's native implementation while
- * delegating data-pack fluids to Hot Bath's component-aware container handler.
- * Extending FluidBucketWrapper also preserves Create's stacked-bucket handling.
- */
+/** Native bucket semantics with component/NBT identity for data-pack bath fluids. */
 public final class CompatibleFluidBucketWrapper extends FluidBucketWrapper {
-    private final IFluidHandlerItem custom;
-
-    public CompatibleFluidBucketWrapper(ItemStack stack, IFluidHandlerItem custom) {
+    public CompatibleFluidBucketWrapper(ItemStack stack) {
         super(stack);
-        this.custom = custom;
-    }
-
-    private boolean isCustomBucket() {
-        return container.is(CustomFluidItems.CUSTOM_FLUID_BUCKET.get());
-    }
-
-    @Override
-    public FluidStack getFluid() {
-        return isCustomBucket() ? custom.getFluidInTank(0) : super.getFluid();
-    }
-
-    @Override
-    public boolean isFluidValid(int tank, FluidStack fluid) {
-        if (tank != 0) {
-            return false;
-        }
-        return CustomFluidStackHelper.isDynamicCustomFluid(fluid)
-                ? custom.isFluidValid(tank, fluid) : super.canFillFluidType(fluid);
     }
 
     @Override
     public int fill(FluidStack fluid, FluidAction action) {
-        // Do not let ordinary fluids overwrite an existing custom bath, or let
-        // malformed dynamic fluids fall through and lose their custom identity.
-        if (!CustomFluidStackHelper.isDynamicCustomFluid(fluid)) {
-            return isCustomBucket() ? 0 : super.fill(fluid, action);
-        }
-        if (!container.is(Items.BUCKET) || container.getCount() != 1) {
-            return 0;
-        }
-        int result = custom.fill(fluid, action);
-        // Both delegates replace their container on execution; simulations must
-        // leave the exposed item stack unchanged.
-        if (action.execute() && result > 0) {
-            container = custom.getContainer();
-        }
-        return result;
+        // A malformed filled custom bucket must not be treated as an empty bucket.
+        return container.is(Items.BUCKET) ? super.fill(fluid, action) : 0;
     }
 
     @Override
-    public FluidStack drain(int amount, FluidAction action) {
-        if (!isCustomBucket()) {
-            return super.drain(amount, action);
+    public FluidStack getFluid() {
+        if (!container.is(CustomFluidItems.CUSTOM_FLUID_BUCKET.get())) {
+            return super.getFluid();
         }
-        if (container.getCount() != 1) {
-            return FluidStack.EMPTY;
-        }
-        FluidStack result = custom.drain(amount, action);
-        if (action.execute() && !result.isEmpty()) {
-            container = custom.getContainer();
-        }
-        return result;
+        // Legacy lookup may migrate data, so read a copy even during SIMULATE.
+        ResourceLocation id = CustomFluidStackHelper.getFluidId(container.copy());
+        return id == null || CustomFluidRegistry.getDefinition(id).isEmpty()
+                ? FluidStack.EMPTY : CustomFluidStackHelper.createStack(id, CustomFluidStackHelper.BUCKET_AMOUNT);
     }
 
     @Override
-    public FluidStack drain(FluidStack fluid, FluidAction action) {
-        if (!isCustomBucket()) {
-            return super.drain(fluid, action);
+    public boolean canFillFluidType(FluidStack fluid) {
+        return CustomFluidStackHelper.isDynamicCustomFluid(fluid)
+                ? CustomFluidStackHelper.getDefinition(fluid).isPresent() : super.canFillFluidType(fluid);
+    }
+
+    @Override
+    public boolean isFluidValid(int tank, FluidStack fluid) {
+        return tank == 0 && canFillFluidType(fluid);
+    }
+
+    @Override
+    protected void setFluid(FluidStack fluid) {
+        if (CustomFluidStackHelper.isDynamicCustomFluid(fluid)) {
+            container = CustomFluidAPI.createBucket(CustomFluidStackHelper.getFluidId(fluid));
+        } else {
+            super.setFluid(fluid);
         }
-        if (container.getCount() != 1) {
-            return FluidStack.EMPTY;
-        }
-        FluidStack result = custom.drain(fluid, action);
-        if (action.execute() && !result.isEmpty()) {
-            container = custom.getContainer();
-        }
-        return result;
     }
 }
