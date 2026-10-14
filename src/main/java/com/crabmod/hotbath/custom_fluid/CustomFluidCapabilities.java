@@ -1,5 +1,6 @@
 package com.crabmod.hotbath.custom_fluid;
 
+import com.crabmod.hotbath.registers.ItemRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -8,6 +9,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
 
 public final class CustomFluidCapabilities {
     private CustomFluidCapabilities() {
@@ -20,6 +22,14 @@ public final class CustomFluidCapabilities {
                         stack, new CustomFluidContainerHandler(stack, ContainerKind.BUCKET)),
                 Items.BUCKET,
                 CustomFluidItems.CUSTOM_FLUID_BUCKET.get());
+        // NeoForge's automatic bucket provider excludes BucketItem subclasses.
+        // Register our six built-in bath buckets explicitly for Create and FluidUtil.
+        event.registerItem(
+                Capabilities.FluidHandler.ITEM,
+                (stack, context) -> new FluidBucketWrapper(stack),
+                ItemRegister.HOT_WATER_BUCKET.get(), ItemRegister.HONEY_BATH_BUCKET.get(),
+                ItemRegister.MILK_BATH_BUCKET.get(), ItemRegister.HERBAL_BATH_BUCKET.get(),
+                ItemRegister.PEONY_BATH_BUCKET.get(), ItemRegister.ROSE_BATH_BUCKET.get());
         event.registerItem(
                 Capabilities.FluidHandler.ITEM,
                 (stack, context) -> new CustomFluidContainerHandler(stack, ContainerKind.BOTTLE),
@@ -64,13 +74,17 @@ public final class CustomFluidCapabilities {
 
         @Override
         public boolean isFluidValid(int tank, FluidStack stack) {
-            return tank == 0 && CustomFluidStackHelper.getFluidId(stack) != null;
+            return tank == 0 && CustomFluidStackHelper.getDefinition(stack).isPresent();
         }
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
             ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(resource);
-            if (fluidId == null || resource.getAmount() < kind.amount || !isEmptyContainer()) {
+            // A syntactically valid but unregistered ID cannot produce a container.
+            // Reject it during simulation too, before a caller consumes any fluid.
+            if (container.getCount() != 1 || fluidId == null
+                    || CustomFluidRegistry.getDefinition(fluidId).isEmpty()
+                    || resource.getAmount() < kind.amount || !isEmptyContainer()) {
                 return 0;
             }
 
@@ -97,7 +111,7 @@ public final class CustomFluidCapabilities {
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
             FluidStack contained = getContainedFluid();
-            if (contained.isEmpty() || maxDrain < kind.amount) {
+            if (container.getCount() != 1 || contained.isEmpty() || maxDrain < kind.amount) {
                 return FluidStack.EMPTY;
             }
 
@@ -116,8 +130,11 @@ public final class CustomFluidCapabilities {
         }
 
         private FluidStack getContainedFluid() {
-            ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(container);
-            if (fluidId == null || !isFilledContainer()) {
+            // Legacy identity lookup may migrate components; reads and SIMULATE
+            // must never mutate the caller's bucket or bottle.
+            ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(container.copy());
+            if (fluidId == null || !isFilledContainer()
+                    || CustomFluidRegistry.getDefinition(fluidId).isEmpty()) {
                 return FluidStack.EMPTY;
             }
             return CustomFluidStackHelper.createStack(fluidId, kind.amount);
