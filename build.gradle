@@ -298,3 +298,22 @@ sourceSets.each {
     it.output.resourcesDir = dir
     it.java.destinationDirectory = dir
 }
+
+
+// Focused regression tests are a development mod, never part of the production JAR.
+sourceSets {
+    bucketTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        def outputDirectory = layout.buildDirectory.dir('sourcesSets/bucketTest').get().asFile
+        output.resourcesDir = outputDirectory
+        java.destinationDirectory = outputDirectory
+    }
+}
+configurations.bucketTestImplementation.extendsFrom(configurations.implementation)
+configurations.bucketTestCompileOnly.extendsFrom(configurations.compileOnly)
+configurations.bucketTestRuntimeOnly.extendsFrom(configurations.runtimeOnly)
+tasks.named('check') { dependsOn tasks.named('bucketTestClasses') }
+runs.gameTestServer {
+    modSources { add('hotbath_bucket_tests', sourceSets.bucketTest) }
+}
