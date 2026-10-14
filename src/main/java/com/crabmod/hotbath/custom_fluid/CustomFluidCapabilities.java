@@ -14,76 +14,42 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.common.Mod;
-import org.jetbrains.annotations.Nullable;
-
-import javax.annotation.Nonnull;
 
 @Mod.EventBusSubscriber(modid = HotBath.MOD_ID)
 public final class CustomFluidCapabilities {
     public static final ResourceLocation CAPABILITY_ID = new ResourceLocation(HotBath.MOD_ID, "custom_fluid_container");
-
-    private CustomFluidCapabilities() {
-    }
+    private CustomFluidCapabilities() {}
 
     @SubscribeEvent
     public static void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
         ItemStack stack = event.getObject();
-        if (stack.is(Items.BUCKET)) {
-            event.addCapability(CAPABILITY_ID, createProvider(stack, ContainerKind.BUCKET));
-        } else if (stack.is(Items.GLASS_BOTTLE)) {
-            event.addCapability(CAPABILITY_ID, createProvider(stack, ContainerKind.BOTTLE));
-        }
+        // Empty buckets use their intrinsic provider, installed by the narrow BucketItem mixin.
+        if (stack.is(Items.GLASS_BOTTLE)) { event.addCapability(CAPABILITY_ID, createProvider(stack, false)); }
     }
 
     public static ICapabilityProvider createProvider(ItemStack stack, boolean bucket) {
-        return createProvider(stack, bucket ? ContainerKind.BUCKET : ContainerKind.BOTTLE);
+        return bucket ? new CompatibleFluidBucketWrapper(stack) : new BottleProvider(stack);
     }
 
-    private static ICapabilityProvider createProvider(ItemStack stack, ContainerKind kind) {
-        return new CustomFluidContainerProvider(new CustomFluidContainerHandler(stack, kind));
-    }
-
-    private enum ContainerKind {
-        BUCKET(CustomFluidStackHelper.BUCKET_AMOUNT),
-        BOTTLE(CustomFluidStackHelper.BOTTLE_AMOUNT);
-
-        final int amount;
-
-        ContainerKind(int amount) {
-            this.amount = amount;
-        }
-    }
-
-    private static final class CustomFluidContainerProvider implements ICapabilityProvider {
+    private static final class BottleProvider implements ICapabilityProvider {
         private final LazyOptional<IFluidHandlerItem> handler;
+        private BottleProvider(ItemStack stack) { handler = LazyOptional.of(() -> new CustomFluidBottleHandler(stack)); }
 
-        private CustomFluidContainerProvider(IFluidHandlerItem handler) {
-            this.handler = LazyOptional.of(() -> handler);
-        }
-
-        @Nonnull
         @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-            if (cap == ForgeCapabilities.FLUID_HANDLER_ITEM) {
-                return handler.cast();
-            }
-            return LazyOptional.empty();
+        public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction side) {
+            return capability == ForgeCapabilities.FLUID_HANDLER_ITEM ? handler.cast() : LazyOptional.empty();
         }
     }
 
-    private static final class CustomFluidContainerHandler implements IFluidHandlerItem {
+    private static final class CustomFluidBottleHandler implements IFluidHandlerItem {
         private ItemStack container;
-        private final ContainerKind kind;
 
-        private CustomFluidContainerHandler(ItemStack container, ContainerKind kind) {
-            this.container = container;
-            this.kind = kind;
+        private CustomFluidBottleHandler(ItemStack stack) {
+            container = stack;
         }
 
         @Override
-        public int getTanks() {
-            return 1;
-        }
+        public int getTanks() { return 1; }
 
         @Override
         public FluidStack getFluidInTank(int tank) {
@@ -92,82 +58,54 @@ public final class CustomFluidCapabilities {
 
         @Override
         public int getTankCapacity(int tank) {
-            return tank == 0 ? kind.amount : 0;
+            return tank == 0 ? CustomFluidStackHelper.BOTTLE_AMOUNT : 0;
         }
 
         @Override
-        public boolean isFluidValid(int tank, FluidStack stack) {
-            return tank == 0 && CustomFluidStackHelper.getFluidId(stack) != null;
+        public boolean isFluidValid(int tank, FluidStack fluid) {
+            return tank == 0 && CustomFluidStackHelper.getDefinition(fluid).isPresent();
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(resource);
-            if (fluidId == null || resource.getAmount() < kind.amount || !isEmptyContainer()) {
+        public int fill(FluidStack fluid, FluidAction action) {
+            ResourceLocation id = CustomFluidStackHelper.getFluidId(fluid);
+            if (container.getCount() != 1 || !container.is(Items.GLASS_BOTTLE) || id == null
+                    || CustomFluidRegistry.getDefinition(id).isEmpty()
+                    || fluid.getAmount() < CustomFluidStackHelper.BOTTLE_AMOUNT) {
                 return 0;
             }
-
-            if (action.execute()) {
-                container = switch (kind) {
-                    case BUCKET -> CustomFluidAPI.createBucket(fluidId);
-                    case BOTTLE -> CustomFluidAPI.createBottle(fluidId);
-                };
-            }
-            return kind.amount;
+            if (action.execute()) { container = CustomFluidAPI.createBottle(id); }
+            return CustomFluidStackHelper.BOTTLE_AMOUNT;
         }
 
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
+        public FluidStack drain(FluidStack fluid, FluidAction action) {
             FluidStack contained = getContainedFluid();
-            if (contained.isEmpty()
-                    || resource.getAmount() < kind.amount
-                    || !CustomFluidStackHelper.hasSameFluidId(contained, resource)) {
+            if (fluid.getAmount() < CustomFluidStackHelper.BOTTLE_AMOUNT
+                    || !CustomFluidStackHelper.hasSameFluidId(contained, fluid)) {
                 return FluidStack.EMPTY;
             }
-            return drain(kind.amount, action);
+            return drain(CustomFluidStackHelper.BOTTLE_AMOUNT, action);
         }
 
         @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
+        public FluidStack drain(int amount, FluidAction action) {
             FluidStack contained = getContainedFluid();
-            if (contained.isEmpty() || maxDrain < kind.amount) {
+            if (container.getCount() != 1 || amount < CustomFluidStackHelper.BOTTLE_AMOUNT || contained.isEmpty()) {
                 return FluidStack.EMPTY;
             }
-
-            if (action.execute()) {
-                container = switch (kind) {
-                    case BUCKET -> new ItemStack(Items.BUCKET);
-                    case BOTTLE -> new ItemStack(Items.GLASS_BOTTLE);
-                };
-            }
+            if (action.execute()) { container = new ItemStack(Items.GLASS_BOTTLE); }
             return contained;
         }
 
         @Override
-        public ItemStack getContainer() {
-            return container;
-        }
+        public ItemStack getContainer() { return container; }
 
         private FluidStack getContainedFluid() {
-            ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(container);
-            if (fluidId == null || !isFilledContainer()) {
-                return FluidStack.EMPTY;
-            }
-            return CustomFluidStackHelper.createStack(fluidId, kind.amount);
-        }
-
-        private boolean isEmptyContainer() {
-            return switch (kind) {
-                case BUCKET -> container.is(Items.BUCKET);
-                case BOTTLE -> container.is(Items.GLASS_BOTTLE);
-            };
-        }
-
-        private boolean isFilledContainer() {
-            return switch (kind) {
-                case BUCKET -> container.is(CustomFluidItems.CUSTOM_FLUID_BUCKET.get());
-                case BOTTLE -> container.is(CustomFluidItems.CUSTOM_FLUID_BOTTLE.get());
-            };
+            if (!container.is(CustomFluidItems.CUSTOM_FLUID_BOTTLE.get())) { return FluidStack.EMPTY; }
+            ResourceLocation id = CustomFluidStackHelper.getFluidId(container.copy());
+            return id == null || CustomFluidRegistry.getDefinition(id).isEmpty()
+                    ? FluidStack.EMPTY : CustomFluidStackHelper.createStack(id, CustomFluidStackHelper.BOTTLE_AMOUNT);
         }
     }
 }
