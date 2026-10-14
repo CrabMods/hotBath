@@ -327,3 +327,22 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
+
+// Focused regression tests are a development mod, never part of the production JAR.
+sourceSets {
+    bucketTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        def outputDirectory = layout.buildDirectory.dir('sourcesSets/bucketTest').get().asFile
+        output.resourcesDir = outputDirectory
+        java.destinationDirectory = outputDirectory
+    }
+}
+configurations.bucketTestImplementation.extendsFrom(configurations.implementation)
+configurations.bucketTestCompileOnly.extendsFrom(configurations.compileOnly)
+configurations.bucketTestRuntimeOnly.extendsFrom(configurations.runtimeOnly)
+tasks.named('check') { dependsOn tasks.named('bucketTestClasses') }
+minecraft.runs.gameTestServer {
+    mods { hotbath_bucket_tests { source sourceSets.bucketTest } }
+}

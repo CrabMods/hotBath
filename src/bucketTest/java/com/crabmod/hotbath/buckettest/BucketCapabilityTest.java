@@ -1,4 +1,4 @@
-package com.crabmod.hotbath.gametest;
+package com.crabmod.hotbath.buckettest;
 
 import com.crabmod.hotbath.custom_fluid.CustomFluidAPI;
 import com.crabmod.hotbath.custom_fluid.CustomFluidDefinition;
