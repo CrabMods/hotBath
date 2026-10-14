@@ -32,6 +32,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -74,7 +75,12 @@ public class BucketCapabilityTest {
                             "stackCounts", List.of(1, 2, 16),
                             "unknownAndMalformedIdsRejected", true,
                             "legacyReadSimulationUnchanged", true,
-                            "registryRestored", true));
+                            "registryRestored", true,
+                            "process", Map.of("pid", ProcessHandle.current().pid(),
+                                    "maxHeapBytes", Runtime.getRuntime().maxMemory(),
+                                    "availableProcessors", Runtime.getRuntime().availableProcessors()),
+                            "createVersion", createLoaded ? ModList.get().getModContainerById("create")
+                                    .orElseThrow().getModInfo().getVersion().toString() : "absent"));
             Files.writeString(path, new GsonBuilder().setPrettyPrinting().create().toJson(receipt),
                     StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
         } catch (Exception error) {
@@ -150,6 +156,8 @@ public class BucketCapabilityTest {
             }
         } finally {
             CustomFluidRegistry.onFluidsReloaded(previous);
+            check(new HashSet<>(previous).equals(new HashSet<>(CustomFluidRegistry.getAllDefinitions())),
+                    "Custom fluid registry was not restored");
         }
     }
 
