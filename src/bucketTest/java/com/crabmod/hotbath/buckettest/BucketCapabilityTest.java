@@ -39,7 +39,7 @@ import java.nio.file.StandardOpenOption;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public class BucketCapabilityTest {
-    @GameTest(template = "empty_1x1", timeoutTicks = 20)
+    @GameTest(templateNamespace = "hotbath_bucket_capabilities", template = "empty_1x1", timeoutTicks = 20)
     public static void test_bucket_capabilities(GameTestHelper helper) {
         boolean createLoaded = ModList.get().isLoaded("create");
         check(!Boolean.getBoolean("hotbath.requireCreateBucketTests") || createLoaded,
