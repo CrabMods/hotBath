@@ -163,7 +163,7 @@ public class BucketCapabilityTest {
 
     private static void verifyRoundTrip(FluidStack fluid, ItemStack expected) {
         IFluidHandlerItem handler = handler(new ItemStack(Items.BUCKET));
-        check(handler.fill(fluid.copyWithAmount(999), FluidAction.EXECUTE) == 0, "Partial fill accepted");
+        check(handler.fill(withAmount(fluid, 999), FluidAction.EXECUTE) == 0, "Partial fill accepted");
         check(handler.fill(fluid, FluidAction.SIMULATE) == 1000, "Fill simulation rejected");
         check(handler.getContainer().is(Items.BUCKET), "Simulation changed the container");
         check(handler.fill(fluid, FluidAction.EXECUTE) == 1000, "Fill rejected");
@@ -242,7 +242,7 @@ public class BucketCapabilityTest {
         FluidStack fluid = CustomFluidStackHelper.createStack(id, 250);
         ItemStack expected = CustomFluidAPI.createBottle(id);
         IFluidHandlerItem empty = handler(new ItemStack(Items.GLASS_BOTTLE));
-        check(empty.fill(fluid.copyWithAmount(249), FluidAction.EXECUTE) == 0, "Partial bottle fill accepted");
+        check(empty.fill(withAmount(fluid, 249), FluidAction.EXECUTE) == 0, "Partial bottle fill accepted");
         check(empty.fill(fluid, FluidAction.SIMULATE) == 250 && empty.getContainer().is(Items.GLASS_BOTTLE),
                 "Bottle fill simulation changed the item");
         check(empty.fill(fluid, FluidAction.EXECUTE) == 250, "Bottle fill rejected");
@@ -265,7 +265,7 @@ public class BucketCapabilityTest {
             for (int count : List.of(1, 2, 16)) {
                 ItemStack input = new ItemStack(Items.BUCKET, count);
                 ItemStack before = input.copy();
-                FluidStack available = fluid.copyWithAmount(2000);
+                FluidStack available = withAmount(fluid, 2000);
                 check(com.simibubi.create.content.fluids.spout.FillingBySpout.canItemBeFilled(level, input),
                         "Create rejected empty buckets");
                 int amount = com.simibubi.create.content.fluids.spout.FillingBySpout.getRequiredAmountForItem(
@@ -287,6 +287,12 @@ public class BucketCapabilityTest {
         IFluidHandlerItem handler = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).orElse(null);
         check(handler != null, "Missing bucket fluid capability");
         return handler;
+    }
+
+    private static FluidStack withAmount(FluidStack fluid, int amount) {
+        FluidStack copy = fluid.copy();
+        copy.setAmount(amount);
+        return copy;
     }
 
     private static boolean sameFluid(FluidStack left, FluidStack right) {

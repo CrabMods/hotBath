@@ -28,7 +28,9 @@ public abstract class GenericItemFillingMixin {
         if (!(handler instanceof CompatibleFluidBucketWrapper)) {
             return;
         }
-        int accepted = handler.fill(fluid.copyWithAmount(CustomFluidStackHelper.BUCKET_AMOUNT), FluidAction.SIMULATE);
+        FluidStack candidate = fluid.copy();
+        candidate.setAmount(CustomFluidStackHelper.BUCKET_AMOUNT);
+        int accepted = handler.fill(candidate, FluidAction.SIMULATE);
         cir.setReturnValue(accepted > 0 ? accepted : -1);
     }
 }
