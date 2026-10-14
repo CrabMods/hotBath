@@ -131,6 +131,8 @@ public class BucketCapabilityTest {
             verifyRoundTrip(fluid, expected);
             FluidStack other = CustomFluidStackHelper.createStack(second.id(), 1000);
             verifyRoundTrip(other, CustomFluidAPI.createBucket(second.id()));
+            verifyBottle(fixture.id(), second.id());
+            verifyBottle(second.id(), fixture.id());
             IFluidHandlerItem filled = handler(expected.copy());
             check(filled.fill(new FluidStack(Fluids.WATER, 1000), FluidAction.EXECUTE) == 0,
                     "Ordinary fluid must not overwrite a custom bath");
@@ -234,6 +236,28 @@ public class BucketCapabilityTest {
                     "Mixed refill drained a stale fluid");
             check(capability.getContainer().is(Items.BUCKET), "Mixed refill did not reset bucket");
         }
+    }
+
+    private static void verifyBottle(ResourceLocation id, ResourceLocation otherId) {
+        FluidStack fluid = CustomFluidStackHelper.createStack(id, 250);
+        ItemStack expected = CustomFluidAPI.createBottle(id);
+        IFluidHandlerItem empty = handler(new ItemStack(Items.GLASS_BOTTLE));
+        check(empty.fill(fluid.copyWithAmount(249), FluidAction.EXECUTE) == 0, "Partial bottle fill accepted");
+        check(empty.fill(fluid, FluidAction.SIMULATE) == 250 && empty.getContainer().is(Items.GLASS_BOTTLE),
+                "Bottle fill simulation changed the item");
+        check(empty.fill(fluid, FluidAction.EXECUTE) == 250, "Bottle fill rejected");
+        check(ItemStack.isSameItemSameTags(empty.getContainer(), expected), "Bottle identity lost");
+        IFluidHandlerItem filled = handler(empty.getContainer());
+        check(filled.drain(CustomFluidStackHelper.createStack(otherId, 250), FluidAction.EXECUTE).isEmpty(),
+                "Bottle drained a different custom ID");
+        check(filled.drain(249, FluidAction.EXECUTE).isEmpty(), "Partial bottle drain accepted");
+        check(sameFluid(filled.drain(250, FluidAction.SIMULATE), fluid)
+                        && ItemStack.isSameItemSameTags(filled.getContainer(), expected),
+                "Bottle drain simulation changed the item");
+        check(sameFluid(filled.drain(250, FluidAction.EXECUTE), fluid)
+                        && filled.getContainer().is(Items.GLASS_BOTTLE), "Bottle drain lost fluid or item");
+        check(handler(new ItemStack(Items.GLASS_BOTTLE, 2)).fill(fluid, FluidAction.EXECUTE) == 0,
+                "Stacked bottles consumed");
     }
 
     private static final class CreateChecks {
