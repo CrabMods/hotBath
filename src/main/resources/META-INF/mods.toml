@@ -140,6 +140,14 @@ description='''${mod_description}'''
     ordering="AFTER"
     side="BOTH"
 
+# Optional EMF compatibility uses the animation pause API introduced in 3.1.
+[[dependencies.${mod_id}]]
+    modId="entity_model_features"
+    mandatory=false
+    versionRange="[3.1,)"
+    ordering="AFTER"
+    side="CLIENT"
+
 # Optional dependency for Epic Fight - animated player renderer dirtiness overlay
 [[dependencies.${mod_id}]]
     modId="epicfight"

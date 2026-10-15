@@ -1,6 +1,7 @@
 package com.crabmod.hotbath.dirtiness;
 
 import com.crabmod.hotbath.HotBath;
+import com.crabmod.hotbath.compat.EmfDirtinessCompat;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -19,6 +20,7 @@ public class DirtinessClientEvents {
      */
     @SubscribeEvent
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+        EmfDirtinessCompat.initialize();
         // Add to default player renderer
         PlayerRenderer defaultRenderer = event.getSkin("default");
         if (defaultRenderer != null) {
