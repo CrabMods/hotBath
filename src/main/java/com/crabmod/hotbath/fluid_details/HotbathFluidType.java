@@ -49,6 +49,7 @@ public class HotbathFluidType {
         return register(
                 name,
                 FluidType.Properties.create()
+                        .descriptionId("block." + HotBath.MOD_ID + "." + name.replace("_fluid_type", "_block"))
                         .lightLevel(2)
                         .density(1000)
                         .viscosity(1000)
