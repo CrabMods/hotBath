@@ -1,0 +1,46 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "thirst"
+    }
+  ],
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "type": "forge:difference",
+    "base": {
+      "item": "minecraft:water_bucket"
+    },
+    "subtracted": [
+      {
+        "type": "forge:nbt",
+        "item": "minecraft:water_bucket",
+        "nbt": { "Purity": -1 }
+      },
+      {
+        "type": "forge:nbt",
+        "item": "minecraft:water_bucket",
+        "nbt": {
+          "Purity": 0
+        }
+      },
+      {
+        "type": "forge:nbt",
+        "item": "minecraft:water_bucket",
+        "nbt": {
+          "Purity": 1
+        }
+      },
+      {
+        "type": "forge:nbt",
+        "item": "minecraft:water_bucket",
+        "nbt": {
+          "Purity": 2
+        }
+      }
+    ]
+  },
+  "result": "hotbath:hot_water_bucket",
+  "experience": 0.35,
+  "cookingtime": 200
+}

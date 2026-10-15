@@ -1,19 +1,10 @@
 {
-  "forge:conditions": [
+  "conditions": [
     {
       "type": "forge:not",
       "value": {
-        "type": "forge:and",
-        "values": [
-          {
-            "type": "forge:mod_loaded",
-            "modid": "polymorph"
-          },
-          {
-            "type": "forge:mod_loaded",
-            "modid": "thirst"
-          }
-        ]
+        "type": "forge:mod_loaded",
+        "modid": "thirst"
       }
     }
   ],
