@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -217,6 +218,16 @@ public class DynamicFluidType extends FluidType {
             @Override
             public int getTintColor() {
                 return DEFAULT_TINT_COLOR;
+            }
+
+            // Machines carry the custom fluid ID on the stack, without a world position.
+            @Override
+            public int getTintColor(FluidStack stack) {
+                ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(stack);
+                return fluidId == null ? DEFAULT_TINT_COLOR
+                        : CustomFluidRegistry.getRuntimeData(fluidId)
+                                .map(CustomFluidRegistry.RuntimeFluidData::getColorARGB)
+                                .orElse(DEFAULT_TINT_COLOR);
             }
 
             /**
