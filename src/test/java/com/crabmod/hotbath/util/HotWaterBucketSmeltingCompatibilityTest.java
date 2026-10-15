@@ -1,38 +1,39 @@
 package com.crabmod.hotbath.util;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.nio.file.*;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class HotWaterBucketSmeltingCompatibilityTest {
-
-    @Test
-    void smeltingRecipeIsGuardedFromPolymorphThirstWasTakenConflict() throws IOException {
-        String json = Files.readString(
-                Path.of("src/main/resources/data/hotbath/recipe/hot_water_bucket.json"),
-                StandardCharsets.UTF_8);
-
-        assertAll(
-                () -> assertTrue(json.contains("\"neoforge:conditions\""),
-                        "Hot water smelting should use NeoForge recipe conditions"),
-                () -> assertTrue(json.contains("\"type\": \"neoforge:not\""),
-                        "Recipe should be disabled for the known conflicting mod set"),
-                () -> assertTrue(json.contains("\"type\": \"neoforge:and\""),
-                        "Conflict guard should require both mods, not either mod alone"),
-                () -> assertTrue(json.contains("\"modid\": \"polymorph\""),
-                        "Conflict guard should include Polymorph"),
-                () -> assertTrue(json.contains("\"modid\": \"thirst\""),
-                        "Conflict guard should include Thirst Was Taken's mod id"),
-                () -> assertTrue(json.contains("\"item\": \"minecraft:water_bucket\""),
-                        "Recipe should still heat vanilla water buckets when the conflict is absent"),
-                () -> assertTrue(json.contains("\"hotbath:hot_water_bucket\""),
-                        "Recipe should still produce HotBath hot water buckets when loaded")
-        );
+    private JsonObject recipe(String name) throws IOException {
+        return JsonParser.parseString(Files.readString(Path.of("src/main/resources/data/hotbath/recipe/"+name+".json"))).getAsJsonObject();
+    }
+    @Test void keepsBothHeatingAndPurificationAvailableWithoutPolymorph() throws IOException {
+        var ordinary=recipe("hot_water_bucket");var compatible=recipe("hot_water_bucket_thirst");
+        var absent=ordinary.getAsJsonArray("neoforge:conditions").get(0).getAsJsonObject();
+        assertEquals("neoforge:not",absent.get("type").getAsString());
+        assertEquals("thirst",absent.getAsJsonObject("value").get("modid").getAsString());
+        var present=compatible.getAsJsonArray("neoforge:conditions").get(0).getAsJsonObject();
+        assertEquals("neoforge:mod_loaded",present.get("type").getAsString());
+        assertEquals("thirst",present.get("modid").getAsString());
+        assertFalse(ordinary.toString().contains("polymorph"));
+        assertFalse(compatible.toString().contains("polymorph"));
+        assertEquals("minecraft:smelting",compatible.get("type").getAsString());
+        var ingredient=compatible.getAsJsonObject("ingredient");
+        assertEquals("neoforge:difference",ingredient.get("type").getAsString());
+        assertEquals("minecraft:water_bucket",ingredient.getAsJsonObject("base").get("item").getAsString());
+        var excluded=ingredient.getAsJsonObject("subtracted").getAsJsonArray("children");
+        var purities=new HashSet<Integer>();
+        for(var entry:excluded) {
+            var item=entry.getAsJsonObject();
+            assertEquals("neoforge:components",item.get("type").getAsString());
+            purities.add(item.getAsJsonObject("components").get("thirst:purity").getAsInt());
+        }
+        assertEquals(Set.of(0,1,2),purities);
+        assertTrue(compatible.toString().contains("hotbath:hot_water_bucket"));
     }
 }

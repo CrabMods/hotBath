@@ -1,0 +1,46 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "thirst"
+    }
+  ],
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "type": "neoforge:difference",
+    "base": {
+      "item": "minecraft:water_bucket"
+    },
+    "subtracted": {
+      "type": "neoforge:compound",
+      "children": [
+        {
+          "type": "neoforge:components",
+          "items": "minecraft:water_bucket",
+          "components": {
+            "thirst:purity": 0
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "minecraft:water_bucket",
+          "components": {
+            "thirst:purity": 1
+          }
+        },
+        {
+          "type": "neoforge:components",
+          "items": "minecraft:water_bucket",
+          "components": {
+            "thirst:purity": 2
+          }
+        }
+      ]
+    }
+  },
+  "result": {
+    "id": "hotbath:hot_water_bucket"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}
