@@ -105,6 +105,7 @@ repositories {
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
     mavenCentral()
+    maven { url "https://api.modrinth.com/maven" }
     maven {
         url "https://cursemaven.com"
         content {
@@ -120,6 +121,10 @@ repositories {
 }
 
 dependencies {
+    // Optional EMF animation API; neither dependency is bundled or required at runtime.
+    compileOnly "maven.modrinth:entity-model-features:bRlX1x4e"
+    compileOnly "maven.modrinth:entitytexturefeatures:CfQJbv1u"
+
     def optionalRuntimeOnly = { dependencyNotation ->
         if (!skipOptionalRuntimeMods) {
             add("runtimeOnly", dependencyNotation)

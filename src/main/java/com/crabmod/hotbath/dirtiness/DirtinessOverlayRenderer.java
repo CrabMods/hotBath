@@ -1,6 +1,7 @@
 package com.crabmod.hotbath.dirtiness;
 
 import com.crabmod.hotbath.HotBath;
+import com.crabmod.hotbath.compat.EmfDirtinessCompat;
 import com.crabmod.hotbath.HotBathConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -91,42 +92,47 @@ public class DirtinessOverlayRenderer extends RenderLayer<AbstractClientPlayer, 
         
         PlayerModel<AbstractClientPlayer> model = this.getParentModel();
         
-        // Render dirt on each body part with different intensities
-        // Legs are dirtiest, head is cleanest
-        // Using different thresholds: legs show dirt first, head shows dirt last
-        
-        // Legs - show dirt even at low dirtiness (threshold 0.0)
-        renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftLeg, dirtiness, 1.0f, 0.0f, dirtTexture);
-        renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightLeg, dirtiness, 1.0f, 0.0f, dirtTexture);
-        
-        // Body - moderate threshold (0.15)
-        renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.body, dirtiness, 0.8f, 0.15f, dirtTexture);
-        
-        // Arms - moderate threshold (0.2)
-        renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftArm, dirtiness, 0.7f, 0.2f, dirtTexture);
-        renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightArm, dirtiness, 0.7f, 0.2f, dirtTexture);
-        
-        // Head - high threshold, only shows when very dirty (0.5)
-        renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.head, dirtiness, 0.4f, 0.5f, dirtTexture);
-        
-        // Also render on outer layer parts if they exist and are visible
-        if (model.leftPants.visible) {
-            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftPants, dirtiness, 1.0f, 0.0f, dirtTexture);
-        }
-        if (model.rightPants.visible) {
-            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightPants, dirtiness, 1.0f, 0.0f, dirtTexture);
-        }
-        if (model.jacket.visible) {
-            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.jacket, dirtiness, 0.8f, 0.15f, dirtTexture);
-        }
-        if (model.leftSleeve.visible) {
-            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftSleeve, dirtiness, 0.7f, 0.2f, dirtTexture);
-        }
-        if (model.rightSleeve.visible) {
-            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightSleeve, dirtiness, 0.7f, 0.2f, dirtTexture);
-        }
-        if (model.hat.visible) {
-            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.hat, dirtiness, 0.4f, 0.5f, dirtTexture);
+        AbstractClientPlayer previous = EmfDirtinessCompat.beginOverlay(player);
+        try {
+            // Render dirt on each body part with different intensities
+            // Legs are dirtiest, head is cleanest
+            // Using different thresholds: legs show dirt first, head shows dirt last
+
+            // Legs - show dirt even at low dirtiness (threshold 0.0)
+            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftLeg, dirtiness, 1.0f, 0.0f, dirtTexture);
+            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightLeg, dirtiness, 1.0f, 0.0f, dirtTexture);
+
+            // Body - moderate threshold (0.15)
+            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.body, dirtiness, 0.8f, 0.15f, dirtTexture);
+
+            // Arms - moderate threshold (0.2)
+            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftArm, dirtiness, 0.7f, 0.2f, dirtTexture);
+            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightArm, dirtiness, 0.7f, 0.2f, dirtTexture);
+
+            // Head - high threshold, only shows when very dirty (0.5)
+            renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.head, dirtiness, 0.4f, 0.5f, dirtTexture);
+
+            // Also render on outer layer parts if they exist and are visible
+            if (model.leftPants.visible) {
+                renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftPants, dirtiness, 1.0f, 0.0f, dirtTexture);
+            }
+            if (model.rightPants.visible) {
+                renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightPants, dirtiness, 1.0f, 0.0f, dirtTexture);
+            }
+            if (model.jacket.visible) {
+                renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.jacket, dirtiness, 0.8f, 0.15f, dirtTexture);
+            }
+            if (model.leftSleeve.visible) {
+                renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.leftSleeve, dirtiness, 0.7f, 0.2f, dirtTexture);
+            }
+            if (model.rightSleeve.visible) {
+                renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.rightSleeve, dirtiness, 0.7f, 0.2f, dirtTexture);
+            }
+            if (model.hat.visible) {
+                renderBodyPartWithDirt(poseStack, bufferSource, packedLight, model.hat, dirtiness, 0.4f, 0.5f, dirtTexture);
+            }
+        } finally {
+            EmfDirtinessCompat.endOverlay(previous);
         }
     }
     
