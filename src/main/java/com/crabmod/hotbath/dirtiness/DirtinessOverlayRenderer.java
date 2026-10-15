@@ -59,7 +59,7 @@ public class DirtinessOverlayRenderer extends RenderLayer<AbstractClientPlayer, 
      * but cleaning and getting dirty again will result in a new pattern.
      */
     private static int getPatternFromSeed(long seed) {
-        return Math.abs((int)seed) % NUM_PATTERNS;
+        return DirtinessPattern.index(seed, NUM_PATTERNS);
     }
     
     @Override
