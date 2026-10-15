@@ -70,7 +70,7 @@ public class EpicFightDirtinessPatchedLayer<E extends LivingEntity, T extends Li
         if (seed == 0) {
             seed = player.getUUID().getMostSignificantBits() ^ player.getUUID().getLeastSignificantBits();
         }
-        int patternIndex = Math.abs((int) seed) % NUM_PATTERNS;
+        int patternIndex = com.crabmod.hotbath.dirtiness.DirtinessPattern.index(seed, NUM_PATTERNS);
         ResourceLocation dirtTexture = DIRT_TEXTURES[patternIndex];
         RenderType renderType = RenderType.entityTranslucent(dirtTexture);
 
