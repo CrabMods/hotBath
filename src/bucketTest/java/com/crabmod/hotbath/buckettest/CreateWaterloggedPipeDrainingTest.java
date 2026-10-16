@@ -28,7 +28,7 @@ import java.util.Objects;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class CreateWaterloggedPipeDrainingTest {
-    @GameTest(template = "empty_1x1", timeoutTicks = 50)
+    @GameTest(template = "empty_32x32x32", timeoutTicks = 50)
     public static void test_create_waterlogged_pipe_draining(GameTestHelper helper) {
         if (!net.neoforged.fml.ModList.get().isLoaded("create")) {
             check(!Boolean.getBoolean("hotbath.requireCreateBucketTests"), "Create is required for this run");

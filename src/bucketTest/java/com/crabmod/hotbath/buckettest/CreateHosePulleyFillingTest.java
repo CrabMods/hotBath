@@ -26,7 +26,7 @@ import java.util.List;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class CreateHosePulleyFillingTest {
-    @GameTest(template = "empty_1x1", timeoutTicks = 100)
+    @GameTest(template = "empty_32x32x32", timeoutTicks = 100)
     public static void test_create_hose_filling_large_area(GameTestHelper helper) {
         if (!net.neoforged.fml.ModList.get().isLoaded("create")) {
             if (Boolean.getBoolean("hotbath.requireCreateBucketTests")) {
