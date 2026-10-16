@@ -20,7 +20,7 @@ import java.util.List;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class CustomFluidSourceTest {
-    @GameTest(template = "empty_1x1", batch = "custom_source_stacking", timeoutTicks = 200)
+    @GameTest(template = "empty_32x32x32", batch = "custom_source_stacking", timeoutTicks = 200)
     public static void test_stacked_sources_and_downward_flow(GameTestHelper helper) {
         var level = helper.getLevel();
         var original = new LinkedHashMap<BlockPos, BlockState>();

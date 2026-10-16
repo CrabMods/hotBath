@@ -29,7 +29,7 @@ import java.util.Objects;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class CreateHosePulleyDrainingTest {
-    @GameTest(template = "empty_1x1", timeoutTicks = 100)
+    @GameTest(template = "empty_32x32x32", timeoutTicks = 100)
     public static void test_create_hose_custom_draining(GameTestHelper helper) {
         if (!net.minecraftforge.fml.ModList.get().isLoaded("create")) {
             if (Boolean.getBoolean("hotbath.requireCreateBucketTests")) {

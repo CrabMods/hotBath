@@ -22,7 +22,7 @@ import java.util.List;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class CreateOpenPipeIdentityTest {
-    @GameTest(template = "empty_1x1", timeoutTicks = 30)
+    @GameTest(template = "empty_32x32x32", timeoutTicks = 30)
     public static void test_create_open_pipe_world_identity(GameTestHelper helper) {
         if (!net.minecraftforge.fml.ModList.get().isLoaded("create")) {
             check(!Boolean.getBoolean("hotbath.requireCreateBucketTests"), "Create is required for this run");

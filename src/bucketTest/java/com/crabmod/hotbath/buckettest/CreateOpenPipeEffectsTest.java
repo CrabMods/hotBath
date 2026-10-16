@@ -25,7 +25,7 @@ import java.util.Set;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class CreateOpenPipeEffectsTest {
-    @GameTest(template = "empty_1x1", batch = "open_pipe_effect_pulses", timeoutTicks = 100)
+    @GameTest(template = "empty_32x32x32", batch = "open_pipe_effect_pulses", timeoutTicks = 100)
     public static void test_short_bath_pulses_at_every_clock_phase(GameTestHelper helper) {
         if (!net.minecraftforge.fml.ModList.get().isLoaded("create")) {
             check(!Boolean.getBoolean("hotbath.requireCreateBucketTests"), "Create is required");

@@ -29,7 +29,7 @@ import java.util.UUID;
 @GameTestHolder("hotbath_bucket_capabilities")
 @PrefixGameTestTemplate(false)
 public final class BucketPlacementTest {
-    @GameTest(template = "empty_1x1", timeoutTicks = 100)
+    @GameTest(template = "empty_32x32x32", timeoutTicks = 100)
     public static void test_rejected_bucket_placement_retains_contents(GameTestHelper helper) {
         var level = helper.getLevel();
         var origin = helper.absolutePos(new BlockPos(3, 3, 3));
