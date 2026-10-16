@@ -69,9 +69,12 @@ public final class CreateOpenPipeDrainingTest {
             pipe.manageSource(level);
             var handler = pipe.provideHandler().orElseThrow(() -> new AssertionError("Missing open pipe handler"));
             for (var expected : java.util.List.of(first, second)) {
+                level.removeBlockEntity(output);
+                level.setBlockAndUpdate(output, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                 level.setBlockAndUpdate(output, DynamicFluidRegistry.DYNAMIC_FLUID_STILL.get()
                         .defaultFluidState().createLegacyBlock());
-                CustomFluidStackHelper.setFluidIdAt(level, output, expected);
+                check(CustomFluidStackHelper.setFluidIdAt(level, output, expected)
+                        && expected.equals(CustomFluidStackHelper.getFluidIdAt(level, output)), "Buffered source fixture ID missing");
                 var small = handler.drain(250, FluidAction.EXECUTE);
                 var buffered = handler.getFluidInTank(0).copy();
                 var simulated = handler.drain(250, FluidAction.SIMULATE);
@@ -81,7 +84,8 @@ public final class CreateOpenPipeDrainingTest {
                         && simulated.getAmount() == 250 && remaining.getAmount() == 750
                         && handler.getFluidInTank(0).isEmpty(), "Partial drain changed volume");
                 for (var stack : java.util.List.of(small, buffered, simulated, remaining)) {
-                    check(expected.equals(CustomFluidStackHelper.getFluidId(stack)), "Buffered drain lost or reused another ID");
+                    check(expected.equals(CustomFluidStackHelper.getFluidId(stack)), "Buffered drain lost or reused another ID: expected " + expected
+                            + ", actual " + CustomFluidStackHelper.getFluidId(stack));
                 }
             }
             pipePos = helper.absolutePos(new BlockPos(4096, 3, 4096));
