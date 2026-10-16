@@ -62,26 +62,16 @@ public abstract class DynamicCustomFluid extends ForgeFlowingFluid {
     }
     
     /**
-     * Override canBeReplacedWith to allow different custom fluids to replace each other.
+     * A falling stream must preserve an existing custom-fluid source, including its ID.
+     * Flowing blocks can still be replaced as the stream updates.
      */
     @Override
-    protected boolean canBeReplacedWith(@NotNull FluidState state, @NotNull BlockGetter level, 
-                                        @NotNull BlockPos pos, @NotNull Fluid fluidIn, 
+    protected boolean canBeReplacedWith(@NotNull FluidState state, @NotNull BlockGetter level,
+                                        @NotNull BlockPos pos, @NotNull Fluid fluidIn,
                                         @NotNull Direction direction) {
-        // If direction is not DOWN, don't allow replacement (same as water behavior)
-        if (direction != Direction.DOWN) {
-            return false;
-        }
-        
-        // If it's not the same base fluid type, allow replacement
-        if (!isSame(fluidIn)) {
-            return true;
-        }
-        
-        // Both are dynamic custom fluids - allow replacement and let placement logic handle ID
-        return true;
+        return direction == Direction.DOWN && !state.isSource();
     }
-    
+
     /**
      * Get the customFluidId at a position from BlockEntity.
      */
