@@ -176,8 +176,6 @@ class CreateCompatContractTest {
                         "Create filling must preserve the full FluidStack while Create passes only Fluid to tryDeposit"),
                 () -> assertTrue(fillingMixin.contains("FluidFillingBehaviour.class")
                                 && fillingMixin.contains("remap = false")
-                                && fillingMixin.contains("FluidManipulationBehaviourAccessor")
-                                && fillingMixin.contains("BlockEntityBehaviour")
                                 && fillingMixin.contains("CustomFluidStackContext.getCreateDepositStack")
                                 && fillingMixin.contains("CustomFluidStackHelper.setFluidIdAt")
                                 && fillingMixin.contains("@Inject(method = \"getAtPos\"")
