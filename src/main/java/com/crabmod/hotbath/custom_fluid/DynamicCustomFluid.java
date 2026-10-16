@@ -72,42 +72,16 @@ public abstract class DynamicCustomFluid extends BaseFlowingFluid {
     }
     
     /**
-     * Override canBeReplacedWith to allow different custom fluids to replace each other.
-     * 
-     * <p>Problem: All dynamic custom fluids share the same base fluid type (DYNAMIC_FLUID_STILL),
-     * so the default isSame() check returns true for all of them. This prevents different
-     * custom fluids (e.g., milk_tea vs green_tea) from replacing each other.</p>
-     * 
-     * <p>Solution: When the incoming fluid is also a dynamic custom fluid, we compare their
-     * customFluidIds. If they're different, allow replacement.</p>
+     * A falling stream must preserve an existing custom-fluid source, including its ID.
+     * Flowing blocks can still be replaced as the stream updates.
      */
     @Override
-    protected boolean canBeReplacedWith(@NotNull FluidState state, @NotNull BlockGetter level, 
-                                        @NotNull BlockPos pos, @NotNull Fluid fluidIn, 
+    protected boolean canBeReplacedWith(@NotNull FluidState state, @NotNull BlockGetter level,
+                                        @NotNull BlockPos pos, @NotNull Fluid fluidIn,
                                         @NotNull Direction direction) {
-        // If direction is not DOWN, don't allow replacement (same as water behavior)
-        if (direction != Direction.DOWN) {
-            return false;
-        }
-        
-        // If it's not the same base fluid type, allow replacement
-        if (!isSame(fluidIn)) {
-            return true;
-        }
-        
-        // Both are dynamic custom fluids - compare their customFluidIds
-        // Get the customFluidId at the current position
-        ResourceLocation currentCustomId = getCustomFluidIdAt(level, pos);
-        
-        // We can't easily get the incoming fluid's customFluidId here because we don't
-        // have access to the source position. However, we can allow replacement if
-        // the current fluid has a customFluidId (meaning it's a placed custom fluid).
-        // The actual ID comparison will be done in the placement logic.
-        // For now, return true to allow the replacement to proceed, and let the
-        // placement logic handle the ID propagation.
-        return true;
+        return direction == Direction.DOWN && !state.isSource();
     }
-    
+
     /**
      * Get the customFluidId at a position (from BlockEntity or waterlogging storage).
      */
