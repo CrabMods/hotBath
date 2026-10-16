@@ -112,7 +112,8 @@ public class CustomFluidBucketItem extends Item {
             // Normal fluid placement
             BlockPos placePos = pos.relative(hitResult.getDirection());
             
-            if (!level.mayInteract(player, pos) || !player.mayUseItemAt(placePos, hitResult.getDirection(), stack)) {
+            if (!level.isInWorldBounds(placePos) || !level.mayInteract(player, pos)
+                    || !player.mayUseItemAt(placePos, hitResult.getDirection(), stack)) {
                 return InteractionResultHolder.fail(stack);
             }
             
@@ -133,7 +134,9 @@ public class CustomFluidBucketItem extends Item {
                     } else {
                         // Place dynamic custom fluid block (source) with BlockEntity to store fluid ID
                         BlockState fluidState = CustomFluidBlocksRegister.CUSTOM_FLUID_BLOCK.get().defaultBlockState();
-                        level.setBlock(placePos, fluidState, 11);
+                        if (!level.setBlock(placePos, fluidState, 11)) {
+                            return InteractionResultHolder.fail(stack);
+                        }
                         
                         // Set the fluid ID in the BlockEntity
                         BlockEntity be = level.getBlockEntity(placePos);
