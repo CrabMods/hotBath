@@ -141,7 +141,8 @@ public class CustomFluidNetworking {
      * This is a shared method to avoid code duplication.
      */
     private static List<String> serializeAllFluids() {
-        Collection<CustomFluidDefinition> allFluids = CustomFluidAPI.getAllFluids();
+        // The client can rebuild its runtime mirror while an integrated server syncs.
+        Collection<CustomFluidDefinition> allFluids = CustomFluidManager.getInstance().getAllFluidDefinitions();
         
         if (allFluids.isEmpty()) {
             return List.of();
