@@ -9,7 +9,8 @@
     "FluidDrainingBehaviourMixin",
     "FluidFillingBehaviourMixin",
     "FluidManipulationBehaviourAccessor",
-    "HosePulleyFluidHandlerMixin"
+    "HosePulleyFluidHandlerMixin",
+    "OpenEndedPipeMixin"
   ],
   "client": [],
   "injectors": {
