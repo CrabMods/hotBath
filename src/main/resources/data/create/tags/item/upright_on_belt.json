@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "hotbath:hot_water_bottle",
+    "hotbath:honey_bath_bottle",
+    "hotbath:milk_bath_bottle",
+    "hotbath:herbal_bath_bottle",
+    "hotbath:peony_bath_bottle",
+    "hotbath:rose_bath_bottle",
+    "hotbath:splash_hot_water_bottle",
+    "hotbath:splash_honey_bath_bottle",
+    "hotbath:splash_milk_bath_bottle",
+    "hotbath:splash_herbal_bath_bottle",
+    "hotbath:splash_peony_bath_bottle",
+    "hotbath:splash_rose_bath_bottle",
+    "hotbath:splash_custom_fluid_bottle"
+  ]
+}
