@@ -12,10 +12,10 @@
       "amount": 1000
     },
     {
-      "tag": "forge:leaves"
+      "item": "hotbath:bath_herb"
     },
     {
-      "tag": "forge:leaves"
+      "item": "hotbath:bath_herb"
     }
   ],
   "results": [

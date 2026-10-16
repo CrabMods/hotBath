@@ -12,16 +12,14 @@
       "amount": 1000
     },
     {
-      "item": "minecraft:milk_bucket"
+      "fluidTag": "forge:milk",
+      "amount": 250
     }
   ],
   "results": [
     {
       "fluid": "hotbath:milk_bath_fluid",
       "amount": 1000
-    },
-    {
-      "item": "minecraft:bucket"
     }
   ],
   "heatRequirement": "heated"

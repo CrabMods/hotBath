@@ -12,7 +12,10 @@
       "amount": 1000
     },
     {
-      "item": "minecraft:honey_bottle"
+      "item": "minecraft:honeycomb"
+    },
+    {
+      "item": "minecraft:honeycomb"
     }
   ],
   "results": [
