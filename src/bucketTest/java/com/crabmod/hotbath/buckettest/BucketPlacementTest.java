@@ -55,6 +55,7 @@ public final class BucketPlacementTest {
                 player.setPos(clicked.getX() + .5, y + (mode == 1 ? -3.2 : 1.0), clicked.getZ() + .5);
                 player.setXRot(mode == 1 ? -90 : 90);
                 player.setYRot(0);
+                player.setYHeadRot(0);
                 var eye = player.getEyePosition();
                 var hit = level.clip(new ClipContext(eye, eye.add(player.getViewVector(1).scale(5)),
                         ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
