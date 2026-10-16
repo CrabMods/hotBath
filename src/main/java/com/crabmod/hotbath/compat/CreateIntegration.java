@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * Create mod integration for Hot Bath fluids.
  * Registers Open Pipe Effect Handlers and relies on Create filling recipes for spouts.
+ * Each effect callback represents an actual delivery, independent of the world clock.
  */
 public class CreateIntegration {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -29,7 +30,6 @@ public class CreateIntegration {
     
     // Effect durations (in ticks)
     private static final int PIPE_EFFECT_DURATION = 200; // 10 seconds
-    private static final int PIPE_EFFECT_INTERVAL = 5; // Apply every 5 ticks
     
     /**
      * Check if Create mod is loaded.
@@ -127,8 +127,6 @@ public class CreateIntegration {
     private static class HotWaterPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % PIPE_EFFECT_INTERVAL != 0) return;
-            
             List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living) {
@@ -153,8 +151,6 @@ public class CreateIntegration {
     private static class HoneyBathPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % PIPE_EFFECT_INTERVAL != 0) return;
-            
             List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living) {
@@ -185,8 +181,6 @@ public class CreateIntegration {
     private static class MilkBathPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % (PIPE_EFFECT_INTERVAL * 4) != 0) return; // Less frequent
-            
             List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living) {
@@ -210,8 +204,6 @@ public class CreateIntegration {
     private static class HerbalBathPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % PIPE_EFFECT_INTERVAL != 0) return;
-            
             List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living) {
@@ -242,8 +234,6 @@ public class CreateIntegration {
     private static class PeonyBathPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % PIPE_EFFECT_INTERVAL != 0) return;
-            
             List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living) {
@@ -268,8 +258,6 @@ public class CreateIntegration {
     private static class RoseBathPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % PIPE_EFFECT_INTERVAL != 0) return;
-            
             List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living) {
@@ -295,8 +283,6 @@ public class CreateIntegration {
     private static class DynamicCustomFluidPipeEffect implements OpenPipeEffectHandler {
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            if (level.getGameTime() % PIPE_EFFECT_INTERVAL != 0) return;
-
             ResourceLocation fluidId = CustomFluidStackHelper.getFluidId(fluid);
             if (fluidId == null) {
                 return;
