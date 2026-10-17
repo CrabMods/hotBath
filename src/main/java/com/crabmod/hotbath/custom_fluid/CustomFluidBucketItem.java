@@ -74,7 +74,8 @@ public class CustomFluidBucketItem extends Item {
                 
                 boolean isAlreadyWaterlogged = clickedState.getValue(BlockStateProperties.WATERLOGGED);
                 
-                if (!level.mayInteract(player, pos)) {
+                if (!level.mayInteract(player, pos)
+                        || !player.mayUseItemAt(pos.relative(hitResult.getDirection()), hitResult.getDirection(), stack)) {
                     return InteractionResultHolder.fail(stack);
                 }
                 
