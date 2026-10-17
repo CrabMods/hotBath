@@ -2,6 +2,8 @@ package com.crabmod.hotbath.gametest;
 
 import com.crabmod.hotbath.compat.EpicFightDirtinessPatchedLayer;
 import com.crabmod.hotbath.dirtiness.DirtinessOverlayRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -115,9 +117,14 @@ public class DirtinessRendererConsistencyTest {
                     .getDeclaredMethod("calculateAlpha", float.class);
             efAlpha.setAccessible(true);
 
+            Minecraft client = Minecraft.getInstance();
+            PlayerRenderer playerRenderer = (PlayerRenderer) client.getEntityRenderDispatcher()
+                    .getRenderer(client.player);
+            DirtinessOverlayRenderer vanillaLayer = new DirtinessOverlayRenderer(playerRenderer);
+
             float[] testPoints = {0.0f, 0.01f, 0.1f, 0.25f, 0.5f, 0.75f, 1.0f};
             for (float d : testPoints) {
-                float vanillaVal = (float) vanillaAlpha.invoke(null, d);
+                float vanillaVal = (float) vanillaAlpha.invoke(vanillaLayer, d);
                 float efVal = (float) efAlpha.invoke(null, d);
                 if (Math.abs(vanillaVal - efVal) > 1e-6f) {
                     helper.fail("Alpha formula divergence at dirtiness=" + d
