@@ -1,4 +1,4 @@
-![hotBath Cover](https://raw.githubusercontent.com/crabsatellite/hotBath/1.16.5/hotbath_cover.png)
+![hotBath Cover](https://raw.githubusercontent.com/CrabMods/hotBath/1.16.5/hotbath_cover.png)
 
 # Hot-bath Mod
 
@@ -12,13 +12,13 @@
 
 ▶ [Watch the trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY) · 0:54 · 1080p · English captions, music and effects
 
-[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/crabsatellite/hotBath)
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/CrabMods/hotBath)
 
 <!-- PROMO-VIDEO:END -->
 
 [![Discord](https://img.shields.io/badge/Join-Discord-7289DA?logo=discord&logoColor=white)](https://discord.gg/nQpq2rAA)
 
-[![GitHub](https://img.shields.io/badge/Source%20Code-GitHub-181717?logo=github&logoColor=white)](https://github.com/crabsatellite/hotBath)
+[![GitHub](https://img.shields.io/badge/Source%20Code-GitHub-181717?logo=github&logoColor=white)](https://github.com/CrabMods/hotBath)
 
 [![Mod Download](https://img.shields.io/badge/Download-Mod-FFB119?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/hotbath)
 
