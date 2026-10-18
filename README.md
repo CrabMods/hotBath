@@ -12,11 +12,11 @@
 
 ▶ [Watch the trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY) · 0:54 · 1080p · English captions, music and effects
 
-[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/crabsatellite/hotBath)
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/CrabMods/hotBath)
 
 <!-- PROMO-VIDEO:END -->
 
-[![GitHub](https://img.shields.io/badge/Source%20Code-GitHub-181717?logo=github&logoColor=white)](https://github.com/crabsatellite/hotBath)
+[![GitHub](https://img.shields.io/badge/Source%20Code-GitHub-181717?logo=github&logoColor=white)](https://github.com/CrabMods/hotBath)
 
 [![Mod Download](https://img.shields.io/badge/Download-Mod-FFB119?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/hotbath)
 
@@ -83,8 +83,8 @@ Create unlimited custom bath fluids via datapacks — no code or recompilation r
 
 **Example Datapack Downloads:**
 
-- [hotbath_example_fluids_1.21.1.zip](https://github.com/crabsatellite/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.21.1.zip) — For Minecraft 1.21.1 (NeoForge)
-- [hotbath_example_fluids_1.20.1.zip](https://github.com/crabsatellite/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.20.1.zip) — For Minecraft 1.20.1 (Forge)
+- [hotbath_example_fluids_1.21.1.zip](https://github.com/CrabMods/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.21.1.zip) — For Minecraft 1.21.1 (NeoForge)
+- [hotbath_example_fluids_1.20.1.zip](https://github.com/CrabMods/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.20.1.zip) — For Minecraft 1.20.1 (Forge)
 
 ---
 
@@ -359,8 +359,8 @@ Add **Gunpowder** to any Bath Water Bottle to create its splash version.
 
 **示例数据包下载:**
 
-- [hotbath_example_fluids_1.21.1.zip](https://github.com/crabsatellite/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.21.1.zip) — 适用于 Minecraft 1.21.1 (NeoForge)
-- [hotbath_example_fluids_1.20.1.zip](https://github.com/crabsatellite/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.20.1.zip) — 适用于 Minecraft 1.20.1 (Forge)
+- [hotbath_example_fluids_1.21.1.zip](https://github.com/CrabMods/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.21.1.zip) — 适用于 Minecraft 1.21.1 (NeoForge)
+- [hotbath_example_fluids_1.20.1.zip](https://github.com/CrabMods/hotBath/releases/download/example-datapacks/hotbath_example_fluids_1.20.1.zip) — 适用于 Minecraft 1.20.1 (Forge)
 
 ---
 
