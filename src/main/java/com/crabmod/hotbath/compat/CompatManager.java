@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  */
 public class CompatManager {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String GITHUB_ISSUES_URL = "https://github.com/crabsatellite/hotBath/issues";
+    private static final String GITHUB_ISSUES_URL = "https://github.com/CrabMods/hotBath/issues";
     
     // Track which compats have been disabled due to errors
     private static final Map<String, CompatError> DISABLED_COMPATS = new ConcurrentHashMap<>();

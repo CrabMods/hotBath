@@ -10,7 +10,7 @@
 
 ▶ [Watch the trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY) · 0:54 · 1080p · English captions, music and effects
 
-[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/crabsatellite/hotBath)
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/CrabMods/hotBath)
 
 <!-- PROMO-VIDEO:END -->
 
