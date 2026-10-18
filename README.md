@@ -1,45 +1,123 @@
+![hotBath Cover](https://raw.githubusercontent.com/CrabMods/hotBath/1.16.5/hotbath_cover.png)
+
 # Hot Bath
 
-Six bath fluids for survival, with portable bath bottles, optional dirtiness and mod integrations.
+<!-- PROMO-VIDEO:START -->
 
-[Download: CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [Full guide](https://crabmods.com/mods/hotbath) · [Trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY)
+**Take a break from your adventures. Build a warm bath, wash away dirt and recharge with six bath fluids, portable bath bottles and useful mod integrations.**
 
-## Bath types
+| Minecraft | Loader | Java |
+| --- | --- | --- |
+| 1.20.1 | Forge | 17 |
+| 1.21.1 | NeoForge | 21 |
 
-| Bath | Main properties |
-| --- | --- |
-| Hot Water | Speed after soaking; no built-in healing |
-| Milk | Slow healing, hunger recovery and cleansing; keeps Bad Luck and Bad Omen |
-| Herbal | Slow healing, Resistance and cleansing, including Bad Luck; keeps Bad Omen |
-| Peony | Slow healing, attack speed and knockback resistance; Luck after repeated visits |
-| Honey | Slow healing, faster hunger recovery and Absorption, with Slowness |
-| Rose | Faster healing, Strength and cleansing, including Bad Omen |
+Choose the matching file for your Minecraft version and loader. Install on the server and every connecting client. Older releases may have different features.
 
-All six wash off dirt. Bottles provide separate drink/splash effects. Datapacks can add custom baths; [ShowerCore](https://crabmods.com/mods/showercore) adds showers and bathtubs.
+[![Watch the trailer](https://i.ytimg.com/vi/4oi4OFmUXuY/maxresdefault.jpg)](https://www.youtube.com/watch?v=4oi4OFmUXuY)
 
-## Install and start
+ [Watch the trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY) · 0:54 · 1080p · English captions, music and effects
 
-Use the download matching your Minecraft version and loader. Install on both server and clients; no other mod is required. The maintained lanes are Forge 1.20.1 (Java 17) and NeoForge 1.21.1 (Java 21). Older releases have different features.
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/CrabMods/hotBath)
 
-Smelt a Water Bucket in a furnace, pour the Hot Water into a pool and step in. Ingredient baths use a crafting table. Forge 1.20.1 needs [Fluidlogged](https://modrinth.com/mod/fluidlogged) for stairs and slabs; NeoForge 1.21.1 supports bath waterlogging directly.
+<!-- PROMO-VIDEO:END -->
 
-[Recipes, effects, custom baths and compatibility](https://crabmods.com/mods/hotbath) · [Changelog](https://github.com/CrabMods/hotBath/releases) · [Report an issue](https://github.com/CrabMods/hotBath/issues)
+> **Full player guide:** For advanced features, complete recipes, detailed effects, configuration and compatibility, visit the [official Hot Bath guide](https://crabmods.com/mods/hotbath).
 
-[Mod integration API](https://github.com/CrabMods/hotBath/blob/neoforge-1.21.1/src/main/java/com/crabmod/hotbath/api/HotBathApi.java) · [Custom fluid API](https://github.com/CrabMods/hotBath/blob/neoforge-1.21.1/src/main/java/com/crabmod/hotbath/custom_fluid/CustomFluidAPI.java)
+## Introduction
 
-## 中文
+Welcome to **Hot Bath Mod**! Take a break from your adventures and soak in a relaxing hot bath. It's not just about hygiene; it's about buffs, healing, and magical effects! Whether you need to recover health, remove negative effects, or just warm up, we have the perfect bath for you.
 
-六种浴液，搭配饮用/喷溅浴水瓶、可关闭的污渍度系统，以及可选模组联动。
+## Classic Features (Items & Recipes)
 
-| 浴液 | 主要性质 |
-| --- | --- |
-| 热水 | 浸泡后加速，本身不回血 |
-| 牛奶浴 | 缓慢回血、恢复饥饿、清除有害效果，保留霉运和不祥之兆 |
-| 草药浴 | 缓慢回血、抗性提升、清除有害效果（包括霉运），保留不祥之兆 |
-| 牡丹浴 | 缓慢回血、攻速与击退抗性，多次入浴后获得幸运 |
-| 蜂蜜浴 | 缓慢回血、更快恢复饥饿与伤害吸收，附带缓慢 |
-| 玫瑰浴 | 更快回血、力量与清除效果，可清除不祥之兆 |
+### Bath Herb![Bath Herb.png](https://s2.loli.net/2023/04/07/IkPTs9oiJXHFWqK.png)
 
-六种浴液都能清洗污渍；浴水瓶的效果与浸泡不同。数据包可添加自定义浴液，[ShowerCore](https://crabmods.com/mods/showercore) 提供淋浴和浴缸。
+**How to get:**
 
-按 Minecraft 与加载器下载对应文件，服务端和客户端都需安装，无必需前置。当前维护 Forge 1.20.1 / Java 17 与 NeoForge 1.21.1 / Java 21。水桶在熔炉烧成热水后倒入池中，其他浴液在工作台合成。配方、数值、联动和常见问题见[完整指南](https://crabmods.com/mods/hotbath)。
+- Buy 1 bath herb for 10 emeralds![Emerald.png](https://s2.loli.net/2023/04/08/fw4jOyVhkgrmFHX.png) from **Novice Farmer Villagers**.
+- Buy 1 bath herb for 15 emeralds![Emerald.png](https://s2.loli.net/2023/04/08/fw4jOyVhkgrmFHX.png) from **Wandering Traders**.
+
+### The Buckets
+
+#### Hot Water ![Hot Water Bucket.png](https://s2.loli.net/2023/04/07/XYJBf8jmznaL7kr.png)
+
+**Description**: Soaking your feet is really comfortable.
+
+**Recipe**: Water Bucket![Water Bucket.png](https://s2.loli.net/2023/04/08/mTFAS1uIUkDybCQ.png) + Smelting (Any Fuel)
+
+**Main effects:**
+
+- Soak for a Speed boost. Plain Hot Water does not heal by itself.
+
+#### Milk Bath ![Milk Bath Bucket.png](https://s2.loli.net/2023/04/07/k4sI8SHvE3pfrFj.png)
+
+**Description**: It's not for drinking.
+
+**Recipe**: Hot Water Bucket + Milk Bucket![Milk Bucket.png](https://s2.loli.net/2023/04/08/CH4uJGBlXftIY7S.png)
+
+![milk_bath_bucket composite.png](https://s2.loli.net/2023/04/14/QjiAKvuzX4tgnfE.png)
+
+**Main effects:**
+
+- Slowly restores health and hunger. Cleanses harmful effects after soaking, except Bad Luck and Bad Omen.
+
+#### Herbal Bath ![Herbal Bath Bucket.png](https://s2.loli.net/2023/04/07/XvrICsoYZy9MfHj.png)
+
+**Description**: Bah, why is this so bitter?
+
+**Recipe**: Hot Water Bucket + Bath Herb x2
+
+![bath_herb_composite.png](https://s2.loli.net/2023/04/14/N4xX7IgsL9vwhaH.png)
+
+**Main effects:**
+
+- Slowly restores health, grants Resistance and hurts undead. Its cleansing can remove Bad Luck, but keeps Bad Omen.
+
+#### Peony Bath ![Peony Bath Bucket.png](https://s2.loli.net/2023/04/07/OFyVon7BhYZPfcT.png)
+
+**Recipe**: Hot Water Bucket + Peony x2![Peony.png](https://s2.loli.net/2023/04/08/6yvZNRKkDOaw17m.png)
+
+![peony_bath_bucket composite.png](https://s2.loli.net/2023/04/14/lcuf1i5Lbde3a2G.png)
+
+**Main effects:**
+
+- Slowly restores health and gives attack speed and knockback resistance. Repeated visits unlock a Luck bonus; its cleansing also removes Bad Omen.
+
+#### Honey Bath ![Honey Bath Bucket.png](https://s2.loli.net/2023/04/07/mEzaoJX1YADjHfd.png)
+
+**Description**: This bath is a little bit sticky.
+
+**Recipe**: Hot Water Bucket + Honeycomb Block![Honeycomb Block.png](https://s2.loli.net/2023/04/08/S3BRdFJHV9UoNsq.png)
+
+![honey_bath_bucket composite.png](https://s2.loli.net/2023/04/14/jOzVXciDkxS8dH5.png)
+
+**Main effects:**
+
+- Slowly restores health, restores hunger faster and gives Absorption. The sticky bath also slows you down; cleansing keeps Slowness, Bad Luck and Bad Omen.
+
+#### Rose Bath ![Rose Bath Bucket.png](https://s2.loli.net/2023/04/07/7kDylN8VWsMeLzx.png)
+
+**Description**: What a romantic treat.
+
+**Recipe**: Hot Water Bucket + Rose Bush x8![Rose Bush.png](https://s2.loli.net/2023/04/08/vCiNFBXp8HWV47n.png)
+
+![rose_bath_bucket composite.png](https://s2.loli.net/2023/04/14/NczwiMtxAUjXekO.png)
+
+**Main effects:**
+
+- Restores health faster, grants Strength and cleanses harmful effects, including Bad Omen.
+
+## Bath Water Bottles
+
+Take a bath with you: fill bottles with bath water to drink, or brew them with gunpowder for splash versions. Each bath has its own bottle effects; drinking and splashing are different from soaking in a pool.
+
+## Dirtiness and Mod Integrations
+
+Bathing washes off dirt. The optional dirtiness system and integrations add reasons to build a bath beside your base. [ShowerCore](https://crabmods.com/mods/showercore) adds functional showers, bathtubs and rubber ducks. Temperature, creature and automation integrations depend on the other mods installed.
+
+For stairs and slabs, Forge 1.20.1 uses [Fluidlogged](https://modrinth.com/mod/fluidlogged); NeoForge 1.21.1 supports bath waterlogging directly. Integration APIs and custom datapack baths are covered in the official guide.
+
+## More details
+
+For more advanced features, full recipes, effect values, configuration and compatibility help, see the **[official player guide](https://crabmods.com/mods/hotbath)**.
+
+[Downloads and release notes](https://github.com/CrabMods/hotBath/releases) · [Report a bug](https://github.com/CrabMods/hotBath/issues)
