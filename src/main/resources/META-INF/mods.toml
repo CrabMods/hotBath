@@ -18,7 +18,7 @@ version="1.14.4-1.0.0" #mandatory
  # A display name for the mod
 displayName="Hot Bath" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
-updateJSONURL = "https://raw.githubusercontent.com/crabsatellite/hotBath/master/updates.json" #optional
+updateJSONURL = "https://raw.githubusercontent.com/CrabMods/hotBath/1.16.5/updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 # displayURL="http://example.com/" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
