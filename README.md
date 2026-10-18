@@ -1,30 +1,45 @@
 # Hot Bath
 
-<!-- PROMO-VIDEO:START -->
+Six bath fluids for survival, with portable bath bottles, optional dirtiness and mod integrations.
 
-**Take a break from your adventures. Build a warm bath, wash away dirt and recharge with six bath fluids, portable bath bottles and useful mod integrations.**
+[Download: CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [Full guide](https://crabmods.com/mods/hotbath) · [Trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY)
 
-`Forge 1.20.1` · `NeoForge 1.21.1`
+## Bath types
 
-[![Watch the trailer](https://i.ytimg.com/vi/4oi4OFmUXuY/maxresdefault.jpg)](https://www.youtube.com/watch?v=4oi4OFmUXuY)
+| Bath | Main properties |
+| --- | --- |
+| Hot Water | Speed after soaking; no built-in healing |
+| Milk | Slow healing, hunger recovery and cleansing; keeps Bad Luck and Bad Omen |
+| Herbal | Slow healing, Resistance and cleansing, including Bad Luck; keeps Bad Omen |
+| Peony | Slow healing, attack speed and knockback resistance; Luck after repeated visits |
+| Honey | Slow healing, faster hunger recovery and Absorption, with Slowness |
+| Rose | Faster healing, Strength and cleansing, including Bad Omen |
 
-▶ [Watch the trailer](https://www.youtube.com/watch?v=4oi4OFmUXuY) · 0:54 · 1080p · English captions, music and effects
+All six wash off dirt. Bottles provide separate drink/splash effects. Datapacks can add custom baths; [ShowerCore](https://crabmods.com/mods/showercore) adds showers and bathtubs.
 
-[CurseForge](https://www.curseforge.com/minecraft/mc-mods/hotbath) · [Modrinth](https://modrinth.com/mod/hot-bath) · [GitHub](https://github.com/CrabMods/hotBath)
+## Install and start
 
-<!-- PROMO-VIDEO:END -->
+Use the download matching your Minecraft version and loader. Install on both server and clients; no other mod is required. The maintained lanes are Forge 1.20.1 (Java 17) and NeoForge 1.21.1 (Java 21). Older releases have different features.
 
-Hot Bath adds bath fluids, bath bottles, dirtiness, and mod integrations for Minecraft 1.21.1 on NeoForge.
+Smelt a Water Bucket in a furnace, pour the Hot Water into a pool and step in. Ingredient baths use a crafting table. Forge 1.20.1 needs [Fluidlogged](https://modrinth.com/mod/fluidlogged) for stairs and slabs; NeoForge 1.21.1 supports bath waterlogging directly.
 
-## Compatibility
+[Recipes, effects, custom baths and compatibility](https://crabmods.com/mods/hotbath) · [Changelog](https://github.com/CrabMods/hotBath/releases) · [Report an issue](https://github.com/CrabMods/hotBath/issues)
 
-- **Waterlogging**: On Minecraft 1.21.1+ NeoForge, Hot Bath supports waterloggable blocks like stairs and slabs natively. Fluidlogged is not required on this branch.
-- **Epic Fight**: Hot Bath registers its dirtiness overlay as an Epic Fight patched layer, so dirt renders on Epic Fight's animated player model. Third-person combat animations and first-person arms are both supported automatically.
-- **Create**: Hot Bath fluids integrate with Create's fluid system. They can move through tanks, pumps, and pipes; open pipes apply bath-style effects; mixers, spouts, emptying recipes, data-pack custom bath fluids, and similar automation features are supported.
-- **External bath containers**: Other mods can identify Hot Bath fluids with the `hotbath:bath_fluids` and `hotbath:cleansing_fluids` fluid tags or `com.crabmod.hotbath.api.HotBathApi`, then call the API to apply gradual dirtiness cleaning from their own validated bath containers. `CustomFluidAPI` also exposes FluidStack helpers so third-party tanks can preserve data-pack custom bath fluid ids.
+[Mod integration API](https://github.com/CrabMods/hotBath/blob/neoforge-1.21.1/src/main/java/com/crabmod/hotbath/api/HotBathApi.java) · [Custom fluid API](https://github.com/CrabMods/hotBath/blob/neoforge-1.21.1/src/main/java/com/crabmod/hotbath/custom_fluid/CustomFluidAPI.java)
 
-## 兼容信息
+## 中文
 
-- **Waterlogging**：Minecraft 1.21.1+ NeoForge 已原生支持楼梯、台阶等可含水方块，不需要 Fluidlogged。
-- **史诗战斗 / Epic Fight**：热水澡会把污渍度覆盖层注册为史诗战斗的 patched layer，让污垢显示在史诗战斗的动画玩家模型上。第三人称战斗动画和第一人称手臂都会自动兼容。
-- **机械动力 / Create**：Hot Bath 流体可以接入 Create 的流体系统，可通过储罐、泵和管道传输；开放管道会触发浴液效果；搅拌、灌装、倒出配方、数据包自定义浴液等自动化功能兼容。
+六种浴液，搭配饮用/喷溅浴水瓶、可关闭的污渍度系统，以及可选模组联动。
+
+| 浴液 | 主要性质 |
+| --- | --- |
+| 热水 | 浸泡后加速，本身不回血 |
+| 牛奶浴 | 缓慢回血、恢复饥饿、清除有害效果，保留霉运和不祥之兆 |
+| 草药浴 | 缓慢回血、抗性提升、清除有害效果（包括霉运），保留不祥之兆 |
+| 牡丹浴 | 缓慢回血、攻速与击退抗性，多次入浴后获得幸运 |
+| 蜂蜜浴 | 缓慢回血、更快恢复饥饿与伤害吸收，附带缓慢 |
+| 玫瑰浴 | 更快回血、力量与清除效果，可清除不祥之兆 |
+
+六种浴液都能清洗污渍；浴水瓶的效果与浸泡不同。数据包可添加自定义浴液，[ShowerCore](https://crabmods.com/mods/showercore) 提供淋浴和浴缸。
+
+按 Minecraft 与加载器下载对应文件，服务端和客户端都需安装，无必需前置。当前维护 Forge 1.20.1 / Java 17 与 NeoForge 1.21.1 / Java 21。水桶在熔炉烧成热水后倒入池中，其他浴液在工作台合成。配方、数值、联动和常见问题见[完整指南](https://crabmods.com/mods/hotbath)。
