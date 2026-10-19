@@ -78,9 +78,16 @@ public class HotBathConfig {
                      "Default: true")
             .define("coralDiesInHotbathFluid", true);
     
+    private static final ModConfigSpec.BooleanValue ENABLE_INFINITE_BATH_SOURCES = BUILDER
+            .comment("Allow matching bath sources to create additional sources, as before.",
+                     "Disabling only prevents new source conversion; existing sources and saved fluid IDs are preserved.",
+                     "Does not change vanilla water or lava source-conversion gamerules.")
+            .define("enableInfiniteBathSources", true);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
     
     // Cached config values for runtime access
+    private static volatile boolean enableInfiniteBathSources = true;
     private static boolean compatibilityMode = false;
     private static boolean enableWaterlogging = true;
     private static boolean enableDirtinessSystem = true;
@@ -146,12 +153,17 @@ public class HotBathConfig {
         return coralDiesInHotbath;
     }
     
+    public static boolean areInfiniteBathSourcesEnabled() {
+        return enableInfiniteBathSources;
+    }
+
     /**
      * Called when the config is loaded or reloaded.
      */
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent event) {
         if (event.getConfig().getSpec() == SPEC) {
+            enableInfiniteBathSources = ENABLE_INFINITE_BATH_SOURCES.get();
             compatibilityMode = COMPATIBILITY_MODE.get();
             enableWaterlogging = ENABLE_WATERLOGGING.get();
             enableDirtinessSystem = ENABLE_DIRTINESS_SYSTEM.get();

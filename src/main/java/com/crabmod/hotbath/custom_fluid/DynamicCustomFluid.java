@@ -145,6 +145,7 @@ public abstract class DynamicCustomFluid extends BaseFlowingFluid {
         
         int maxAmount = 0;
         int sourceCount = 0;
+        ResourceLocation sourceCustomId = myCustomId;
         
         // Check horizontal neighbors
         for (Direction direction : Direction.Plane.HORIZONTAL) {
@@ -164,8 +165,9 @@ public abstract class DynamicCustomFluid extends BaseFlowingFluid {
                         || (neighborCustomId != null && myCustomId.equals(neighborCustomId));
                 
                 if (customIdMatches) {
-                    if (neighborFluid.isSource() && net.neoforged.neoforge.event.EventHooks.canCreateFluidSource(level, neighborPos, neighborState)) {
-                        sourceCount++;
+                    if (neighborFluid.isSource() && neighborCustomId != null && net.neoforged.neoforge.event.EventHooks.canCreateFluidSource(level, neighborPos, neighborState)) {
+                        if (sourceCustomId == null) sourceCustomId = neighborCustomId;
+                        if (sourceCustomId.equals(neighborCustomId)) sourceCount++;
                     }
                     maxAmount = Math.max(maxAmount, neighborFluid.getAmount());
                 }
@@ -173,15 +175,14 @@ public abstract class DynamicCustomFluid extends BaseFlowingFluid {
         }
         
         // Check if can become source (2+ source neighbors and solid below or source of same type below)
-        if (sourceCount >= 2) {
+        if (com.crabmod.hotbath.HotBathConfig.areInfiniteBathSourcesEnabled() && sourceCount >= 2) {
             BlockState belowState = level.getBlockState(pos.below());
             FluidState belowFluid = belowState.getFluidState();
             if (belowState.isSolid() || hotbath$isSourceBlockOfThisType(belowFluid)) {
                 // Also check customFluidId for the below fluid if it exists
                 if (!belowFluid.isEmpty() && belowFluid.getType().isSame(this)) {
                     ResourceLocation belowCustomId = getCustomFluidIdAt(level, pos.below());
-                    boolean customIdMatches = (myCustomId == null) 
-                            || (belowCustomId != null && myCustomId.equals(belowCustomId));
+                    boolean customIdMatches = sourceCustomId != null && sourceCustomId.equals(belowCustomId);
                     if (customIdMatches) {
                         return getSource(false);
                     }
