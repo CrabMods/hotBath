@@ -26,6 +26,7 @@ public class CustomFluidReloadListener {
     public static void onAddReloadListener(AddReloadListenerEvent event) {
         CustomFluidManager manager = new CustomFluidManager();
         event.addListener(manager);
+        event.addListener(new com.crabmod.hotbath.dirtiness.DirtinessEffectRules());
         HotBath.LOGGER.info("Registered custom fluid reload listener");
     }
 
