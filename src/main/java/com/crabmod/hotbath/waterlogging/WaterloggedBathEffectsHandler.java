@@ -45,7 +45,17 @@ public final class WaterloggedBathEffectsHandler {
                 .ifPresent(match -> match.block().applyWaterloggedEntityInside(level, match.pos(), player));
     }
 
-    private static Optional<WaterloggedBathMatch> findWaterloggedBath(ServerPlayer player) {
+    @SubscribeEvent
+    public static void onMobTick(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event) {
+        if (event.getEntity() instanceof net.minecraft.world.entity.LivingEntity entity
+                && !entity.level().isClientSide() && entity.isInWater()
+                && com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(entity)) {
+            findWaterloggedBath(entity).ifPresent(match ->
+                    match.block().applyWaterloggedEntityInside(entity.level(), match.pos(), entity));
+        }
+    }
+
+    private static Optional<WaterloggedBathMatch> findWaterloggedBath(net.minecraft.world.entity.LivingEntity player) {
         Level level = player.level();
 
         for (BlockPos pos : candidatePositions(player)) {
@@ -65,7 +75,7 @@ public final class WaterloggedBathEffectsHandler {
         return Optional.empty();
     }
 
-    private static List<BlockPos> candidatePositions(ServerPlayer player) {
+    private static List<BlockPos> candidatePositions(net.minecraft.world.entity.LivingEntity player) {
         LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
         addPosition(positions, player.blockPosition());
         addPosition(positions, BlockPos.containing(player.getEyePosition()));

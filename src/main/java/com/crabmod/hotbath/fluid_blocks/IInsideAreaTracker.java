@@ -37,15 +37,24 @@ public interface IInsideAreaTracker {
         return 10;
     }
 
+    Map<net.minecraft.world.entity.LivingEntity, Map<String, AreaState>> MOB_AREA_STATE_CACHE =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
     default InsideAreaResult trackInside(ServerPlayer player) {
+        var cache = AREA_STATE_CACHE.computeIfAbsent(getAreaKey(), k -> new ConcurrentHashMap<>());
+        UUID uuid = player.getUUID();
+        return advance(cache.get(uuid), player.tickCount, reenterThresholdTicks(), state -> cache.put(uuid, state));
+    }
+
+    default InsideAreaResult trackInside(net.minecraft.world.entity.LivingEntity entity) {
+        if (entity instanceof ServerPlayer player) return trackInside(player);
+        var cache = MOB_AREA_STATE_CACHE.computeIfAbsent(entity, k -> new java.util.HashMap<>());
         String key = getAreaKey();
-        UUID playerUUID = player.getUUID();
-        int currentTick = player.tickCount;
-        
-        // Get or create the area-specific cache
-        Map<UUID, AreaState> playerCache = AREA_STATE_CACHE.computeIfAbsent(key, k -> new ConcurrentHashMap<>());
-        AreaState state = playerCache.get(playerUUID);
-        
+        return advance(cache.get(key), entity.tickCount, reenterThresholdTicks(), state -> cache.put(key, state));
+    }
+
+    private static InsideAreaResult advance(AreaState state, int currentTick, int threshold,
+                                            java.util.function.Consumer<AreaState> save) {
         int lastInsideTick = state != null ? state.lastInsideTick() : 0;
         int stayedTime = state != null ? state.stayedTime() : 0;
         int enterCount = state != null ? state.enterCount() : 0;
@@ -57,7 +66,7 @@ public interface IInsideAreaTracker {
 
         boolean isFirstEnter = lastInsideTick == 0
                 || currentTick < lastInsideTick
-                || (currentTick - lastInsideTick) > reenterThresholdTicks();
+                || (currentTick - lastInsideTick) > threshold;
 
         int newEnterCount = enterCount;
         int newStayedTime;
@@ -70,7 +79,7 @@ public interface IInsideAreaTracker {
         }
 
         // Update cache (single write instead of multiple NBT writes)
-        playerCache.put(playerUUID, new AreaState(currentTick, newStayedTime, newEnterCount));
+        save.accept(new AreaState(currentTick, newStayedTime, newEnterCount));
 
         return new InsideAreaResult(isFirstEnter, true, newStayedTime, newEnterCount);
     }
