@@ -325,5 +325,9 @@
   "hotbath.entry.create.name": "機械動力",
   "hotbath.entry.create.page1": "$(l)機械動力$()聯動讓 Hot Bath 浴液接入 Create 的流體自動化。$(br2)浴液可以進入儲罐、泵和管道，開放管道噴出時會觸發對應浴液效果。",
   "hotbath.entry.create.automation.title": "自動化",
-  "hotbath.entry.create.automation": "$(li)灌裝器可把浴液灌入玻璃瓶$(li)物品排液器可把浴液瓶倒回流體$(li)加熱攪拌可製作常見浴液$(li)資料包自定義浴液在 Create 流體處理中會保持自身類型"
+  "hotbath.entry.create.automation": "$(li)灌裝器可把浴液灌入玻璃瓶$(li)物品排液器可把浴液瓶倒回流體$(li)加熱攪拌可製作常見浴液$(li)資料包自定義浴液在 Create 流體處理中會保持自身類型",
+  "hotbath.settings.title": "Hot Bath 顯示設定",
+  "hotbath.settings.description": "僅改變本機顯示，不影響髒污機制。",
+  "hotbath.settings.dirt": "顯示污垢：%s",
+  "hotbath.settings.flies": "顯示蒼蠅：%s"
 }

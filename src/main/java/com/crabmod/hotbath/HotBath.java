@@ -78,6 +78,10 @@ public class HotBath {
         
         // Register config
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, HotBathConfig.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, HotBathClientConfig.SPEC);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            com.crabmod.hotbath.client.HotBathSettingsScreen.register();
+        }
         
         ItemGroup.register(modEventBus);
         FluidsRegister.register(modEventBus);

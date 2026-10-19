@@ -1,5 +1,7 @@
 package com.crabmod.hotbath.dirtiness;
 
+import com.crabmod.hotbath.HotBathClientConfig;
+
 import com.crabmod.hotbath.HotBath;
 import com.crabmod.hotbath.compat.EmfDirtinessCompat;
 import com.crabmod.hotbath.HotBathConfig;
@@ -69,7 +71,7 @@ public class DirtinessOverlayRenderer extends RenderLayer<AbstractClientPlayer, 
                        float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         
         // Check if dirtiness system is enabled
-        if (!HotBathConfig.isDirtinessEnabled()) return;
+        if (!HotBathConfig.isDirtinessEnabled() || !HotBathClientConfig.SHOW_DIRT.get()) return;
         
         float dirtiness = DirtinessClientData.getDirtiness(player.getUUID());
         if (dirtiness < MIN_DIRTINESS) return;

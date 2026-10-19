@@ -1,5 +1,7 @@
 package com.crabmod.hotbath.client.particle;
 
+import com.crabmod.hotbath.HotBathClientConfig;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -65,6 +67,7 @@ public class FlyParticle extends TextureSheetParticle {
 
     @Override
     public float getQuadSize(float scaleFactor) {
+        if (!HotBathClientConfig.SHOW_FLIES.get()) return 0.0F;
         // Smooth fade in/out
         float lifeProgress = ((float) this.age + scaleFactor) / (float) this.lifetime;
         float fadeIn = Mth.clamp(lifeProgress * 6.0F, 0.0F, 1.0F);
@@ -74,6 +77,10 @@ public class FlyParticle extends TextureSheetParticle {
 
     @Override
     public void tick() {
+        if (!HotBathClientConfig.SHOW_FLIES.get()) {
+            remove();
+            return;
+        }
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;

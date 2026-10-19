@@ -1,5 +1,7 @@
 package com.crabmod.hotbath.dirtiness;
 
+import com.crabmod.hotbath.HotBathClientConfig;
+
 import com.crabmod.hotbath.HotBath;
 import com.crabmod.hotbath.HotBathConfig;
 import com.crabmod.hotbath.registers.ParticleRegister;
@@ -33,7 +35,7 @@ public class FlyParticleHandler {
     @SubscribeEvent
     public static void onClientLevelTick(TickEvent.LevelTickEvent event) {
         // Check if dirtiness system is enabled
-        if (!HotBathConfig.isDirtinessEnabled()) return;
+        if (!HotBathConfig.isDirtinessEnabled() || !HotBathClientConfig.SHOW_FLIES.get()) return;
         
         if (event.phase != TickEvent.Phase.END) return;
         

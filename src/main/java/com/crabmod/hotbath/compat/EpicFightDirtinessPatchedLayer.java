@@ -1,5 +1,7 @@
 package com.crabmod.hotbath.compat;
 
+import com.crabmod.hotbath.HotBathClientConfig;
+
 import com.crabmod.hotbath.HotBath;
 import com.crabmod.hotbath.HotBathConfig;
 import com.crabmod.hotbath.dirtiness.DirtinessClientData;
@@ -53,7 +55,7 @@ public class EpicFightDirtinessPatchedLayer<E extends LivingEntity, T extends Li
     protected void renderLayer(T entitypatch, E entity, @Nullable R vanillaLayer,
                                PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                OpenMatrix4f[] poses, float bob, float yRot, float xRot, float partialTicks) {
-        if (!HotBathConfig.isDirtinessEnabled()) return;
+        if (!HotBathConfig.isDirtinessEnabled() || !HotBathClientConfig.SHOW_DIRT.get()) return;
         if (!(entity instanceof Player player)) return;
 
         float dirtiness = DirtinessClientData.getDirtiness(player.getUUID());
