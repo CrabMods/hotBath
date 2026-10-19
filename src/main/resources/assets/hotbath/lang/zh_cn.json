@@ -329,5 +329,6 @@
   "hotbath.settings.title": "Hot Bath 显示设置",
   "hotbath.settings.description": "仅改变本机显示，不影响脏污机制。",
   "hotbath.settings.dirt": "显示污垢：%s",
-  "hotbath.settings.flies": "显示苍蝇：%s"
+  "hotbath.settings.flies": "显示苍蝇：%s",
+  "block.hotbath.bath_herb_crop": "浴草"
 }

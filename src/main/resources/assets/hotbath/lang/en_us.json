@@ -329,5 +329,6 @@
   "hotbath.settings.title": "Hot Bath Display Settings",
   "hotbath.settings.description": "Only changes what you see.",
   "hotbath.settings.dirt": "Show dirt: %s",
-  "hotbath.settings.flies": "Show flies: %s"
+  "hotbath.settings.flies": "Show flies: %s",
+  "block.hotbath.bath_herb_crop": "Bath Herb"
 }

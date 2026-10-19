@@ -4,7 +4,6 @@ import com.crabmod.hotbath.HotBath;
 import com.crabmod.hotbath.items.BathBucketItem;
 import com.crabmod.hotbath.items.BathWaterBottleItem;
 import com.crabmod.hotbath.items.BathWaterEffects;
-import com.crabmod.hotbath.items.DescriptiveItem;
 import com.crabmod.hotbath.items.SplashBathWaterBottleItem;
 import com.crabmod.hotbath.fluid_details.FluidsColor;
 import net.minecraft.world.item.Item;
@@ -39,7 +38,7 @@ public class ItemRegister {
             () -> new BathBucketItem(FluidsRegister.ROSE_BATH_FLUID, new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> DESCRIPTIVE_ITEM = ITEMS.register("descriptive_item",
-            () -> new DescriptiveItem(new Item.Properties()));
+            () -> new com.crabmod.hotbath.items.BathHerbItem(new Item.Properties()));
 
     public static final RegistryObject<Item> HOT_WATER_BOTTLE = ITEMS.register("hot_water_bottle",
             () -> new BathWaterBottleItem(new Item.Properties().stacksTo(16), BathWaterEffects::hotWaterEffect));
