@@ -58,7 +58,7 @@ public class CustomFluidNetworking {
     
     @SubscribeEvent
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(HotBath.MOD_ID);
+        PayloadRegistrar registrar = event.registrar("2");
         registrar.playToClient(
             SyncCustomFluidsPayload.TYPE,
             SyncCustomFluidsPayload.STREAM_CODEC,
@@ -73,30 +73,7 @@ public class CustomFluidNetworking {
         context.enqueueWork(() -> {
             HotBath.LOGGER.info("Received {} custom fluid definitions from server", payload.fluidJsons().size());
             
-            // Clear existing client-side definitions (server is authoritative)
-            CustomFluidRegistry.clearClientSide();
-            
-            int successCount = 0;
-            
-            for (String json : payload.fluidJsons()) {
-                try {
-                    JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
-                    CustomFluidDefinition definition = CustomFluidDefinition.CODEC
-                            .parse(JsonOps.INSTANCE, jsonObject)
-                            .resultOrPartial(error -> HotBath.LOGGER.warn("Failed to parse synced fluid: {}", error))
-                            .orElse(null);
-                    
-                    if (definition != null) {
-                        CustomFluidRegistry.registerClientSide(definition);
-                        definition.registerTranslations();
-                        successCount++;
-                    }
-                } catch (Exception e) {
-                    HotBath.LOGGER.error("Error deserializing custom fluid from server: {}", e.getMessage());
-                }
-            }
-            
-            HotBath.LOGGER.info("Client registered {} custom fluids from server", successCount);
+            if (!BathCatalogSync.apply(payload.fluidJsons())) return;
         });
     }
     
@@ -144,11 +121,8 @@ public class CustomFluidNetworking {
         // The client can rebuild its runtime mirror while an integrated server syncs.
         Collection<CustomFluidDefinition> allFluids = CustomFluidManager.getInstance().getAllFluidDefinitions();
         
-        if (allFluids.isEmpty()) {
-            return List.of();
-        }
         
-        List<String> fluidJsons = new ArrayList<>(allFluids.size());
+        List<String> fluidJsons = new ArrayList<>(BuiltinBathDefinitions.serverJsons());
         
         for (CustomFluidDefinition definition : allFluids) {
             try {

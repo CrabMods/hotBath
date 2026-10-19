@@ -1,0 +1,84 @@
+{
+  "id": "hotbath:rose_bath_fluid",
+  "temperature": 37.0,
+  "cleans_dirtiness": true,
+  "bath": {
+    "effects": [
+      {
+        "effect": "minecraft:strength",
+        "duration": 400,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 300,
+        "minimum_entries": 0
+      }
+    ],
+    "healing": {
+      "amount": 0.25,
+      "interval_ticks": 20
+    },
+    "cleansing": {
+      "after_ticks": 300,
+      "count": 2147483647,
+      "category": "harmful",
+      "exclude": [],
+      "include": [
+        "minecraft:bad_omen"
+      ],
+      "selection": "random"
+    },
+    "advancement": {
+      "id": "hotbath:rose_body_fragrance",
+      "entries": 100
+    },
+    "extinguish": false
+  },
+  "drink": {
+    "effects": [
+      {
+        "effect": "minecraft:strength",
+        "duration": 900,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      }
+    ],
+    "extinguish": false
+  },
+  "splash": {
+    "effects": [
+      {
+        "effect": "minecraft:strength",
+        "duration": 600,
+        "amplifier": 1,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      }
+    ],
+    "extinguish": false
+  },
+  "pipe": {
+    "effects": [
+      {
+        "effect": "minecraft:strength",
+        "duration": 200,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      }
+    ],
+    "extinguish": true
+  },
+  "splash_dirtiness_reduction": 0.1
+}

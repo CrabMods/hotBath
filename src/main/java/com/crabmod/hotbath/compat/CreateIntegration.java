@@ -8,7 +8,6 @@ import com.mojang.logging.LogUtils;
 import com.simibubi.create.api.effect.OpenPipeEffectHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -28,8 +27,6 @@ public class CreateIntegration {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String CREATE_MOD_ID = "create";
     
-    // Effect durations (in ticks)
-    private static final int PIPE_EFFECT_DURATION = 200; // 10 seconds
     
     /**
      * Check if Create mod is loaded.
@@ -56,42 +53,42 @@ public class CreateIntegration {
         registerPipeEffect(
             FluidsRegister.HOT_WATER_FLUID.get(),
             FluidsRegister.HOT_WATER_FLOWING.get(),
-            new HotWaterPipeEffect()
+            new BuiltinPipeEffect("hot_water_fluid")
         );
         
         // Honey Bath - Absorption and Slowness
         registerPipeEffect(
             FluidsRegister.HONEY_BATH_FLUID.get(),
             FluidsRegister.HONEY_BATH_FLOWING.get(),
-            new HoneyBathPipeEffect()
+            new BuiltinPipeEffect("honey_bath_fluid")
         );
         
         // Milk Bath - Remove negative effects
         registerPipeEffect(
             FluidsRegister.MILK_BATH_FLUID.get(),
             FluidsRegister.MILK_BATH_FLOWING.get(),
-            new MilkBathPipeEffect()
+            new BuiltinPipeEffect("milk_bath_fluid")
         );
         
         // Herbal Bath - Resistance and Regeneration
         registerPipeEffect(
             FluidsRegister.HERBAL_BATH_FLUID.get(),
             FluidsRegister.HERBAL_BATH_FLOWING.get(),
-            new HerbalBathPipeEffect()
+            new BuiltinPipeEffect("herbal_bath_fluid")
         );
         
         // Peony Bath - Luck
         registerPipeEffect(
             FluidsRegister.PEONY_BATH_FLUID.get(),
             FluidsRegister.PEONY_BATH_FLOWING.get(),
-            new PeonyBathPipeEffect()
+            new BuiltinPipeEffect("peony_bath_fluid")
         );
         
         // Rose Bath - Strength
         registerPipeEffect(
             FluidsRegister.ROSE_BATH_FLUID.get(),
             FluidsRegister.ROSE_BATH_FLOWING.get(),
-            new RoseBathPipeEffect()
+            new BuiltinPipeEffect("rose_bath_fluid")
         );
 
         // Data-pack custom fluids share one registered fluid. The FluidStack
@@ -121,157 +118,16 @@ public class CreateIntegration {
     
     // ==================== Open Pipe Effect Handler Implementations ====================
     
-    /**
-     * Hot Water pipe effect - gives Speed I
-     */
-    private static class HotWaterPipeEffect implements OpenPipeEffectHandler {
+    /** One native delivery reads the current data-pack profile, independent of the world clock. */
+    private static class BuiltinPipeEffect implements OpenPipeEffectHandler {
+        private final String id;
+        BuiltinPipeEffect(String id) { this.id = id; }
+
         @Override
         public void apply(Level level, AABB area, FluidStack fluid) {
-            List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.MOVEMENT_SPEED, 
-                        PIPE_EFFECT_DURATION, 
-                        0, // Level I
-                        false, false, true
-                    ));
-                    // Extinguish fire
-                    if (living.isOnFire()) {
-                        living.clearFire();
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Honey Bath pipe effect - gives Absorption I and Slowness I
-     */
-    private static class HoneyBathPipeEffect implements OpenPipeEffectHandler {
-        @Override
-        public void apply(Level level, AABB area, FluidStack fluid) {
-            List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.ABSORPTION, 
-                        PIPE_EFFECT_DURATION, 
-                        0, 
-                        false, false, true
-                    ));
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.MOVEMENT_SLOWDOWN, 
-                        PIPE_EFFECT_DURATION / 2, 
-                        0, 
-                        false, false, true
-                    ));
-                    // Extinguish fire
-                    if (living.isOnFire()) {
-                        living.clearFire();
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Milk Bath pipe effect - removes negative effects
-     */
-    private static class MilkBathPipeEffect implements OpenPipeEffectHandler {
-        @Override
-        public void apply(Level level, AABB area, FluidStack fluid) {
-            List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    // Remove one random negative effect
-                    living.getActiveEffects().stream()
-                        .filter(effect -> !effect.getEffect().value().isBeneficial())
-                        .findFirst()
-                        .ifPresent(effect -> living.removeEffect(effect.getEffect()));
-                    // Extinguish fire
-                    if (living.isOnFire()) {
-                        living.clearFire();
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Herbal Bath pipe effect - gives Resistance I and Regeneration I
-     */
-    private static class HerbalBathPipeEffect implements OpenPipeEffectHandler {
-        @Override
-        public void apply(Level level, AABB area, FluidStack fluid) {
-            List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.DAMAGE_RESISTANCE, 
-                        PIPE_EFFECT_DURATION, 
-                        0, 
-                        false, false, true
-                    ));
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.REGENERATION, 
-                        PIPE_EFFECT_DURATION / 2, 
-                        0, 
-                        false, false, true
-                    ));
-                    // Extinguish fire
-                    if (living.isOnFire()) {
-                        living.clearFire();
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Peony Bath pipe effect - gives Luck I
-     */
-    private static class PeonyBathPipeEffect implements OpenPipeEffectHandler {
-        @Override
-        public void apply(Level level, AABB area, FluidStack fluid) {
-            List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.LUCK, 
-                        PIPE_EFFECT_DURATION, 
-                        0, 
-                        false, false, true
-                    ));
-                    // Extinguish fire
-                    if (living.isOnFire()) {
-                        living.clearFire();
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Rose Bath pipe effect - gives Strength I
-     */
-    private static class RoseBathPipeEffect implements OpenPipeEffectHandler {
-        @Override
-        public void apply(Level level, AABB area, FluidStack fluid) {
-            List<Entity> entities = level.getEntities((Entity) null, area, e -> e instanceof LivingEntity);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    living.addEffect(new MobEffectInstance(
-                        MobEffects.DAMAGE_BOOST, 
-                        PIPE_EFFECT_DURATION, 
-                        0, 
-                        false, false, true
-                    ));
-                    // Extinguish fire
-                    if (living.isOnFire()) {
-                        living.clearFire();
-                    }
-                }
+            for (Entity entity : level.getEntities((Entity) null, area, e -> e instanceof LivingEntity)) {
+                if (entity instanceof LivingEntity living)
+                    com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.pipe(id, living);
             }
         }
     }

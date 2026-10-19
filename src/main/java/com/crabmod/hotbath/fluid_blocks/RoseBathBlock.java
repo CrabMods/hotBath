@@ -1,16 +1,8 @@
 package com.crabmod.hotbath.fluid_blocks;
 
-import com.crabmod.hotbath.util.EffectRemovalHandler;
-import com.crabmod.hotbath.util.HealthRegenHandler;
-import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 
 import java.util.function.Supplier;
@@ -23,57 +15,8 @@ public class RoseBathBlock extends AbstractHotbathBlock implements IInsideAreaTr
         super(supplier, properties);
     }
 
-    private static final int TICK_NUMBER = 20;
-    private static final int ENTERED_TRIGGER_COUNT = 100;
-    private static final int STAYED_EFFECT_TRIGGER_TIME_SECONDS = 15;
-    private static final String ADVANCEMENT_ID = "hotbath:rose_body_fragrance";
-
     @Override
     protected void applyBathEffects(Level level, BlockPos pos, Entity entity) {
-        if (level.isClientSide) {
-            return;
-        }
-        if (!(entity instanceof ServerPlayer player)) return;
-        if (!player.isAlive()) return;
-
-        InsideAreaResult result = trackInside(player);
-
-        if (!result.shouldProcess()) {
-            return;
-        }
-
-        if (result.isFirstEnter()) {
-            int entered = result.totalEnterCount();
-            if (entered >= ENTERED_TRIGGER_COUNT) {
-                AdvancementHolder advancement =
-                        player.getServer()
-                                .getAdvancements()
-                                .get(ResourceLocation.tryParse(ADVANCEMENT_ID));
-
-                if (advancement != null) {
-                    player.getAdvancements().award(advancement, "code_triggered");
-                }
-            }
-        }
-
-        int stayedTicks = result.stayedTicks();
-
-        HealthRegenHandler.regenHealth(0.25F, 1, player);
-
-        if (stayedTicks >= STAYED_EFFECT_TRIGGER_TIME_SECONDS * TICK_NUMBER) {
-            EffectRemovalHandler.removeNegativeEffects(player);
-            EffectRemovalHandler.removeBadOmen(player);
-
-            player.addEffect(
-                    new MobEffectInstance(
-                            MobEffects.DAMAGE_BOOST,
-                            20 * TICK_NUMBER,
-                            0,
-                            false,
-                            false,
-                            true
-                    )
-            );
-        }
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("rose_bath_fluid", entity, this);
     }
 }

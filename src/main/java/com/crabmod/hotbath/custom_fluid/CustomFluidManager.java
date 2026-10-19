@@ -37,7 +37,7 @@ public class CustomFluidManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String DIRECTORY = "hotbath/custom_fluids";
     
-    private static CustomFluidManager INSTANCE;
+    private static volatile CustomFluidManager INSTANCE;
     
     private Map<ResourceLocation, CustomFluidDefinition> fluidDefinitions = ImmutableMap.of();
 
@@ -69,14 +69,30 @@ public class CustomFluidManager extends SimpleJsonResourceReloadListener {
             @NotNull ResourceManager resourceManager,
             @NotNull ProfilerFiller profiler) {
         
-        // Clear old translations before loading new ones
-        CustomFluidTranslationManager.clearAll();
         
         ImmutableMap.Builder<ResourceLocation, CustomFluidDefinition> builder = ImmutableMap.builder();
         
+        Map<ResourceLocation, BuiltinBathDefinition> builtins = new java.util.HashMap<>();
+        java.util.List<String> builtinJsons = new java.util.ArrayList<>();
         for (Map.Entry<ResourceLocation, JsonElement> entry : resources.entrySet()) {
             ResourceLocation location = entry.getKey();
             JsonElement json = entry.getValue();
+            if (BuiltinBathDefinitions.isBuiltin(location)) {
+                BuiltinBathDefinition definition;
+                try { definition = BuiltinBathDefinition.parse(json); }
+                catch (RuntimeException error) {
+                    throw new IllegalArgumentException("Invalid built-in bath " + location + ": " + error.getMessage(), error);
+                }
+                if (!location.equals(definition.id()))
+                    throw new IllegalArgumentException("Built-in bath id must match its resource path: " + location);
+                builtins.put(location, definition);
+                builtinJsons.add(json.toString());
+                continue;
+            }
+            if (json.isJsonObject() && json.getAsJsonObject().has("id") &&
+                    BuiltinBathDefinitions.isBuiltin(ResourceLocation.parse(json.getAsJsonObject().get("id").getAsString())))
+                throw new IllegalArgumentException("Override a built-in bath at its own resource path: " + location);
+
             
             try {
                 CustomFluidDefinition.CODEC.parse(JsonOps.INSTANCE, json)
@@ -84,8 +100,6 @@ public class CustomFluidManager extends SimpleJsonResourceReloadListener {
                                 HotBath.LOGGER.warn("Failed to parse custom fluid {}: {}", location, error))
                         .ifPresent(definition -> {
                             builder.put(definition.id(), definition);
-                            // Register translations from the fluid definition
-                            definition.registerTranslations();
                             HotBath.LOGGER.debug("Loaded custom fluid: {}", definition.id());
                         });
             } catch (Exception e) {
@@ -93,12 +107,18 @@ public class CustomFluidManager extends SimpleJsonResourceReloadListener {
             }
         }
         
-        this.fluidDefinitions = builder.build();
+        var nextCustom = builder.build();
+        var nextBuiltin = BuiltinBathDefinitions.catalog(builtins, builtinJsons);
+        CustomFluidTranslationManager.clearAll();
+        nextCustom.values().forEach(CustomFluidDefinition::registerTranslations);
+        this.fluidDefinitions = nextCustom;
+        BuiltinBathDefinitions.replace(nextBuiltin);
         HotBath.LOGGER.info("Loaded {} custom fluid definitions with {} translations", 
                 fluidDefinitions.size(), CustomFluidTranslationManager.getTranslationCount());
         
         // Notify the registry to rebuild dynamic fluids
         CustomFluidRegistry.onFluidsReloaded(fluidDefinitions.values());
+        setInstance(this);
     }
 
     /**

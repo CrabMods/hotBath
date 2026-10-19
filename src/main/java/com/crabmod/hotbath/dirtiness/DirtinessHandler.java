@@ -311,7 +311,8 @@ public class DirtinessHandler {
         
         // Check if the fluid itself is a hotbath fluid (built-in or custom)
         if (!fluidState.isEmpty()) {
-            if (HotbathFluidHelper.isHotbathFluid(fluidState.getType())) {
+            if (HotbathFluidHelper.isHotbathFluid(fluidState.getType())
+                    && com.crabmod.hotbath.api.HotBathApi.isCleansingFluid(fluidState.getType())) {
                 return true;
             }
         }
@@ -319,7 +320,8 @@ public class DirtinessHandler {
         // Check for waterlogged blocks with stored hotbath fluids
         net.minecraft.world.level.material.Fluid storedFluid = 
                 HotbathWaterloggingHelper.getStoredFluidType(player.level(), pos);
-        if (storedFluid != null && HotbathFluidHelper.isHotbathFluid(storedFluid)) {
+        if (storedFluid != null && HotbathFluidHelper.isHotbathFluid(storedFluid)
+                && com.crabmod.hotbath.api.HotBathApi.isCleansingFluid(storedFluid)) {
             return true;
         }
         

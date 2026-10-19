@@ -15,7 +15,6 @@ public class CustomFluidReloadListener {
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
         CustomFluidManager manager = new CustomFluidManager();
-        CustomFluidManager.setInstance(manager);
         event.addListener(manager);
         HotBath.LOGGER.info("Registered CustomFluidManager reload listener");
     }

@@ -1,0 +1,100 @@
+{
+  "id": "hotbath:herbal_bath_fluid",
+  "temperature": 37.0,
+  "cleans_dirtiness": true,
+  "bath": {
+    "effects": [
+      {
+        "effect": "minecraft:resistance",
+        "duration": 200,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": true,
+        "show_icon": true,
+        "after_ticks": 100,
+        "minimum_entries": 0
+      }
+    ],
+    "healing": {
+      "amount": 0.25,
+      "interval_ticks": 40
+    },
+    "cleansing": {
+      "after_ticks": 300,
+      "count": 2147483647,
+      "category": "harmful",
+      "exclude": [
+        "minecraft:bad_omen"
+      ],
+      "include": [],
+      "selection": "random"
+    },
+    "undead_damage": {
+      "amount": 0.5,
+      "interval_ticks": 20
+    },
+    "advancement": {
+      "id": "hotbath:chronic_invalid",
+      "entries": 100
+    },
+    "extinguish": false
+  },
+  "drink": {
+    "effects": [
+      {
+        "effect": "minecraft:resistance",
+        "duration": 900,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      }
+    ],
+    "instant_healing": 6,
+    "extinguish": false
+  },
+  "splash": {
+    "effects": [
+      {
+        "effect": "minecraft:resistance",
+        "duration": 600,
+        "amplifier": 1,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      }
+    ],
+    "instant_healing": 4,
+    "extinguish": false
+  },
+  "pipe": {
+    "effects": [
+      {
+        "effect": "minecraft:resistance",
+        "duration": 200,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      },
+      {
+        "effect": "minecraft:regeneration",
+        "duration": 100,
+        "amplifier": 0,
+        "ambient": false,
+        "show_particles": false,
+        "show_icon": true,
+        "after_ticks": 0,
+        "minimum_entries": 0
+      }
+    ],
+    "extinguish": true
+  },
+  "splash_dirtiness_reduction": 0.1
+}

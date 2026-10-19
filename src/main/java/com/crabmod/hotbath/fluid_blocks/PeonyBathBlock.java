@@ -1,22 +1,15 @@
 package com.crabmod.hotbath.fluid_blocks;
 
 import com.crabmod.hotbath.HotBath;
-import com.crabmod.hotbath.events.enter_fluid_events.PeonyBathEvents;
-import com.crabmod.hotbath.util.EffectRemovalHandler;
-import com.crabmod.hotbath.util.HealthRegenHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 
 import java.util.function.Supplier;
@@ -29,8 +22,6 @@ public class PeonyBathBlock extends AbstractHotbathBlock implements IInsideAreaT
         super(supplier, properties);
     }
 
-    private static final int TICK_NUMBER = 20;
-    private static final int LUCK_THRESHOLD = 50;
     public static final ResourceLocation ATTACK_SPEED_MODIFIER_NAME =
             ResourceLocation.fromNamespaceAndPath(
                     HotBath.MOD_ID, "peony_bath_attack_speed_modifier");
@@ -41,53 +32,7 @@ public class PeonyBathBlock extends AbstractHotbathBlock implements IInsideAreaT
 
     @Override
     protected void applyBathEffects(Level level, BlockPos pos, Entity entity) {
-        if (level.isClientSide) {
-            return;
-        }
-        if (!(entity instanceof ServerPlayer player)) return;
-        if (!player.isAlive()) return;
-
-        InsideAreaResult result = trackInside(player);
-        if (!result.shouldProcess()) {
-            return;
-        }
-
-        HealthRegenHandler.regenHealth(0.25F, 2, player);
-
-        if (result.stayedTicks() >= 15 * TICK_NUMBER) {
-            applyAttributeModifier(
-                    player,
-                    Attributes.KNOCKBACK_RESISTANCE,
-                    0.05,
-                    KNOCKBACK_RESISTANCE_MODIFIER_NAME,
-                    true,
-                    AttributeModifier.Operation.ADD_VALUE);
-
-            applyAttributeModifier(
-                    player,
-                    Attributes.ATTACK_SPEED,
-                    0.10,
-                    ATTACK_SPEED_MODIFIER_NAME,
-                    true,
-                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-
-            EffectRemovalHandler.removeNegativeEffects(player);
-            EffectRemovalHandler.removeBadOmen(player);
-        }
-
-        if (result.totalEnterCount() >= LUCK_THRESHOLD) {
-            player.addEffect(
-                    new MobEffectInstance(
-                            MobEffects.LUCK,
-                            45 * TICK_NUMBER,
-                            0,
-                            false,
-                            false,
-                            true));
-        }
-
-        // Reset exit timer using memory cache instead of PersistentData
-        PeonyBathEvents.resetExitTimer(player.getUUID());
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("peony_bath_fluid", entity, this);
     }
 
     public static void applyAttributeModifier(
@@ -102,7 +47,9 @@ public class PeonyBathBlock extends AbstractHotbathBlock implements IInsideAreaT
         if (attributeInstance != null) {
             if (add) {
                 AttributeModifier modifier = new AttributeModifier(modifierName, value, operation);
-                if (!attributeInstance.hasModifier(modifierName)) {
+                AttributeModifier previous = attributeInstance.getModifier(modifierName);
+                if (previous == null || previous.amount() != value || previous.operation() != operation) {
+                    attributeInstance.removeModifier(modifierName);
                     attributeInstance.addTransientModifier(modifier);
                 }
             } else {

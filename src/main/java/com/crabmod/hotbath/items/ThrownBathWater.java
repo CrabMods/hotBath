@@ -73,11 +73,11 @@ public class ThrownBathWater extends ThrowableItemProjectile {
                     if (d0 < 16.0D) {
                         splashItem.applyEffect(livingentity);
                         
-                        // Reduce dirtiness by 10% when hit by splash hot water (if enabled)
+                        // Apply this native bath bottle's configured dirtiness reduction.
                         if (HotBathConfig.isDirtinessEnabled() && livingentity instanceof ServerPlayer serverPlayer) {
                             DirtinessData data = serverPlayer.getData(DirtinessAttachment.DIRTINESS);
                             long gameTime = serverPlayer.level().getGameTime();
-                            data.reduceDirtiness(gameTime, 0.10f); // 10% reduction
+                            data.reduceDirtiness(gameTime, com.crabmod.hotbath.custom_fluid.BuiltinBathDefinitions.splashCleaning(splashItem));
                             DirtinessNetworking.syncToClient(serverPlayer);
                         }
                     }
