@@ -214,8 +214,12 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
                 : CustomFluidAPI.getFluidDefinition(customFluidId);
     }
 
+    public void applyImmersionEffects(Level level, BlockPos pos, Entity entity) {
+        applyBathEffects(level, pos, entity);
+    }
+
     @Override
-    public void applyBathEffects(@NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
+    protected void applyBathEffects(@NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
         if (level.isClientSide) {
             return;
         }
