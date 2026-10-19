@@ -112,6 +112,7 @@ public abstract class DynamicCustomFluid extends ForgeFlowingFluid {
         
         int maxAmount = 0;
         int sourceCount = 0;
+        ResourceLocation sourceCustomId = myCustomId;
         
         // Check horizontal neighbors
         for (Direction direction : Direction.Plane.HORIZONTAL) {
@@ -128,8 +129,9 @@ public abstract class DynamicCustomFluid extends ForgeFlowingFluid {
                         || (neighborCustomId != null && myCustomId.equals(neighborCustomId));
                 
                 if (customIdMatches) {
-                    if (neighborFluid.isSource() && net.minecraftforge.event.ForgeEventFactory.canCreateFluidSource(level, neighborPos, neighborState, true)) {
-                        sourceCount++;
+                    if (neighborFluid.isSource() && neighborCustomId != null && net.minecraftforge.event.ForgeEventFactory.canCreateFluidSource(level, neighborPos, neighborState, true)) {
+                        if (sourceCustomId == null) sourceCustomId = neighborCustomId;
+                        if (sourceCustomId.equals(neighborCustomId)) sourceCount++;
                     }
                     maxAmount = Math.max(maxAmount, neighborFluid.getAmount());
                 }
@@ -137,14 +139,13 @@ public abstract class DynamicCustomFluid extends ForgeFlowingFluid {
         }
         
         // Check if can become source (2+ source neighbors and solid below or source of same type below)
-        if (sourceCount >= 2) {
+        if (com.crabmod.hotbath.HotBathConfig.areInfiniteBathSourcesEnabled() && sourceCount >= 2) {
             BlockState belowState = level.getBlockState(pos.below());
             FluidState belowFluid = belowState.getFluidState();
             if (belowState.isSolid() || hotbath$isSourceBlockOfThisType(belowFluid)) {
                 if (!belowFluid.isEmpty() && belowFluid.getType().isSame(this)) {
                     ResourceLocation belowCustomId = getCustomFluidIdAt(level, pos.below());
-                    boolean customIdMatches = (myCustomId == null) 
-                            || (belowCustomId != null && myCustomId.equals(belowCustomId));
+                    boolean customIdMatches = sourceCustomId != null && sourceCustomId.equals(belowCustomId);
                     if (customIdMatches) {
                         return getSource(false);
                     }

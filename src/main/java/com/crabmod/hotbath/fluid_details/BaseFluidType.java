@@ -77,6 +77,19 @@ public class BaseFluidType extends FluidType {
         return fogColor;
     }
 
+    @Override
+    public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
+                                      net.minecraft.world.level.LevelReader level, net.minecraft.core.BlockPos pos) {
+        return com.crabmod.hotbath.HotBathConfig.areInfiniteBathSourcesEnabled()
+                && super.canConvertToSource(state, level, pos);
+    }
+
+    @Override
+    public boolean canConvertToSource(net.minecraftforge.fluids.FluidStack stack) {
+        return com.crabmod.hotbath.HotBathConfig.areInfiniteBathSourcesEnabled()
+                && super.canConvertToSource(stack);
+    }
+
     /**
      * Override to allow water-breathing entities (like tropical fish) to survive in hotBath fluids.
      * Entities that can breathe underwater won't drown in our fluid.
