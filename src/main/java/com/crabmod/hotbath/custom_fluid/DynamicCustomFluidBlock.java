@@ -215,7 +215,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     }
 
     @Override
-    protected void applyBathEffects(@NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
+    public void applyBathEffects(@NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
         if (level.isClientSide) {
             return;
         }

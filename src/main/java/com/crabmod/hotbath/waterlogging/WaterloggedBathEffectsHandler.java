@@ -45,11 +45,8 @@ public final class WaterloggedBathEffectsHandler {
                 .ifPresent(match -> match.block().applyWaterloggedEntityInside(level, match.pos(), player));
     }
 
-    @SubscribeEvent
-    public static void onMobTick(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event) {
-        if (event.getEntity() instanceof net.minecraft.world.entity.LivingEntity entity
-                && !entity.level().isClientSide() && entity.isInWater()
-                && com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(entity)) {
+    public static void applyToMob(net.minecraft.world.entity.LivingEntity entity) {
+        if (!entity.level().isClientSide() && com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(entity)) {
             findWaterloggedBath(entity).ifPresent(match ->
                     match.block().applyWaterloggedEntityInside(entity.level(), match.pos(), entity));
         }
