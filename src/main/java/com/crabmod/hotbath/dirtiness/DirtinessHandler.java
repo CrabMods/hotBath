@@ -139,6 +139,7 @@ public class DirtinessHandler {
             // Not bathing - accumulate dirt based on environment
             handleDirtAccumulation(player, data, factors, gameTime);
         }
+        DirtinessEffectRules.tick(player, data.getDirtiness(gameTime));
     }
     
     /**
