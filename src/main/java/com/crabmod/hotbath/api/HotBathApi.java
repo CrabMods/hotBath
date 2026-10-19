@@ -76,6 +76,11 @@ public final class HotBathApi {
         return true;
     }
 
+    /** Whether a living entity can receive immersion benefits from a bath. */
+    public static boolean canReceiveBathBenefits(net.minecraft.world.entity.LivingEntity entity) {
+        return entity != null && entity.isAlive() && (entity instanceof Player || com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(entity));
+    }
+
     private static boolean isTaggedOrKnownHotBathFluid(Fluid fluid, TagKey<Fluid> tag) {
         return fluid != null && (fluid.defaultFluidState().is(tag) || HotbathFluidHelper.isHotbathFluid(fluid));
     }

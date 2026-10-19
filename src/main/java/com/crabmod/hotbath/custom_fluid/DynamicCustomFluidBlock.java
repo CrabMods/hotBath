@@ -58,11 +58,11 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     /**
      * Checks if this custom fluid at the given position is considered "hot".
      * Looks up the BlockEntity to get the fluid definition and checks its temperature.
-     * Only hot fluids (temperature >= 35°C) cause damage to ice mobs and gummy bears.
+     * Only hot fluids (temperature >= 35閹虹煰) cause damage to ice mobs and gummy bears.
      * 
      * @param level The level
      * @param pos The position of the fluid block
-     * @return true if the fluid at this position is hot (temperature >= 35°C)
+     * @return true if the fluid at this position is hot (temperature >= 35閹虹煰)
      */
     @Override
     public boolean isHotBath(Level level, BlockPos pos) {
@@ -178,7 +178,8 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
             return;
         }
         
-        if (!(entity instanceof ServerPlayer player)) {
+        if (!(entity instanceof net.minecraft.world.entity.LivingEntity player)
+                || (!(player instanceof ServerPlayer) && !com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(player))) {
             return;
         }
         
@@ -210,9 +211,9 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     }
 
     /**
-     * Applies all configured effects to the player.
+     * Applies configured effects to an eligible bather.
      */
-    private void applyEffects(ServerPlayer player, CustomFluidDefinition definition) {
+    private void applyEffects(net.minecraft.world.entity.LivingEntity player, CustomFluidDefinition definition) {
         List<MobEffectInstance> effects = definition.createEffectInstances();
         for (MobEffectInstance effect : effects) {
             player.addEffect(new MobEffectInstance(

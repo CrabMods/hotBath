@@ -19,28 +19,35 @@ public final class BuiltinBathEffects {
     public static void bathe(String id,Entity entity,IInsideAreaTracker tracker) {
         if(entity.level().isClientSide())return;
         var profile=BuiltinBathDefinitions.get(id).bath();
-        if(!(entity instanceof ServerPlayer player)) {
+        if(!(entity instanceof ServerPlayer)) {
             var damage=profile.undeadDamage();
             if(damage!=null && entity instanceof LivingEntity living && living.getMobType()==MobType.UNDEAD && entity.tickCount%damage.intervalTicks()==0)
                 entity.hurt(entity.level().damageSources().magic(),damage.amount());
-            return;
         }
-        if(!player.isAlive())return;
-        var state=tracker.trackInside(player);
+        if(!(entity instanceof LivingEntity bather)||!bather.isAlive())return;
+        ServerPlayer player=bather instanceof ServerPlayer p?p:null;
+        if(player==null&&!com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(bather))return;
+        var state=tracker.trackInside(bather);
         if(!state.shouldProcess())return;
-        if(profile.healing()!=null)HealthRegenHandler.regenHealth(profile.healing().amount(),profile.healing().intervalTicks()/20.0,player);
-        if(profile.hunger()!=null)HungerRegenHandler.regenHunger((int)profile.hunger().amount(),profile.hunger().intervalTicks()/20.0f,player);
-        apply(profile,player,state.stayedTicks(),state.totalEnterCount());
-        if(profile.advancement()!=null && state.isFirstEnter() && state.totalEnterCount()>=profile.advancement().entries())
+        if(profile.healing()!=null) {
+            if(player!=null)HealthRegenHandler.regenHealth(profile.healing().amount(),profile.healing().intervalTicks()/20.0,player);
+            else if((state.stayedTicks()+1)%profile.healing().intervalTicks()==0)bather.heal(profile.healing().amount());
+        }
+        if(player!=null&&profile.hunger()!=null)HungerRegenHandler.regenHunger((int)profile.hunger().amount(),profile.hunger().intervalTicks()/20.0f,player);
+        apply(profile,bather,state.stayedTicks(),state.totalEnterCount());
+        if(player!=null&&profile.advancement()!=null&&state.isFirstEnter()&&state.totalEnterCount()>=profile.advancement().entries())
             AdvancementHelper.tryAwardAdvancement(player,profile.advancement().id().toString(),"code_triggered");
         var peony=profile.peony();
-        if(peony!=null && state.stayedTicks()>=peony.afterTicks()) {
-            PeonyBathBlock.applyAttributeModifier(player,Attributes.KNOCKBACK_RESISTANCE,peony.knockbackResistance(),
+        if(peony!=null&&state.stayedTicks()>=peony.afterTicks()) {
+            PeonyBathBlock.applyAttributeModifier(bather,Attributes.KNOCKBACK_RESISTANCE,peony.knockbackResistance(),
                     PeonyBathBlock.KNOCKBACK_RESISTANCE_MODIFIER_NAME,true,AttributeModifier.Operation.ADDITION);
-            PeonyBathBlock.applyAttributeModifier(player,Attributes.ATTACK_SPEED,peony.attackSpeed(),
+            PeonyBathBlock.applyAttributeModifier(bather,Attributes.ATTACK_SPEED,peony.attackSpeed(),
                     PeonyBathBlock.ATTACK_SPEED_MODIFIER_NAME,true,AttributeModifier.Operation.MULTIPLY_TOTAL);
         }
-        if(id.equals("peony_bath_fluid"))PeonyBathEvents.resetExitTimer(player.getUUID());
+        if(id.equals("peony_bath_fluid")) {
+            if(player!=null)PeonyBathEvents.resetExitTimer(player.getUUID());
+            else com.crabmod.hotbath.entity.FriendlyBathBenefits.refreshPeony(bather);
+        }
     }
 
     public static void use(String id,LivingEntity entity,boolean splash) {

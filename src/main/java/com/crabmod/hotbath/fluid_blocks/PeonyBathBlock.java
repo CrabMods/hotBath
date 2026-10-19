@@ -45,6 +45,16 @@ public class PeonyBathBlock extends AbstractHotbathBlock implements IInsideAreaT
             ResourceLocation modifierName,
             boolean add,
             AttributeModifier.Operation operation) {
+        applyAttributeModifier((net.minecraft.world.entity.LivingEntity) player, attribute, value, modifierName, add, operation);
+    }
+
+    public static void applyAttributeModifier(
+            net.minecraft.world.entity.LivingEntity player,
+            Attribute attribute,
+            double value,
+            ResourceLocation modifierName,
+            boolean add,
+            AttributeModifier.Operation operation) {
         AttributeInstance attributeInstance = player.getAttribute(attribute);
         UUID uuid = UUID.nameUUIDFromBytes(modifierName.toString().getBytes());
 
