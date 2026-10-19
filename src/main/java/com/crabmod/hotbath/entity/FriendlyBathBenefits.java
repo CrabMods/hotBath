@@ -39,7 +39,7 @@ public final class FriendlyBathBenefits {
         if(entity.isInWater()&&isEligible(entity)) {
             var pos=entity.blockPosition();var block=entity.level().getBlockState(pos).getBlock();
             if(block instanceof com.crabmod.hotbath.custom_fluid.DynamicCustomFluidBlock custom) {
-                custom.applyBathEffects(entity.level(),pos,entity);
+                custom.applyImmersionEffects(entity.level(),pos,entity);
             } else if(block instanceof com.crabmod.hotbath.fluid_blocks.IInsideAreaTracker tracker) {
                 BuiltinBathDefinitions.forFluid(entity.level().getFluidState(pos).getType()).ifPresent(definition ->
                         com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe(definition.id().getPath(),entity,tracker));
