@@ -44,21 +44,12 @@ public interface IInsideAreaTracker {
     Map<net.minecraft.world.entity.LivingEntity, Map<String, AreaState>> MOB_AREA_STATE_CACHE =
             java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
 
-    default InsideAreaResult trackInside(ServerPlayer player) {
-        var cache = AREA_STATE_CACHE.computeIfAbsent(getAreaKey(), k -> new ConcurrentHashMap<>());
-        UUID uuid = player.getUUID();
-        return advance(cache.get(uuid), player.tickCount, reenterThresholdTicks(), state -> cache.put(uuid, state));
-    }
-
-    default InsideAreaResult trackInside(net.minecraft.world.entity.LivingEntity entity) {
-        if (entity instanceof ServerPlayer player) return trackInside(player);
-        var cache = MOB_AREA_STATE_CACHE.computeIfAbsent(entity, k -> new java.util.HashMap<>());
-        String key = getAreaKey();
-        return advance(cache.get(key), entity.tickCount, reenterThresholdTicks(), state -> cache.put(key, state));
-    }
-
     default InsideAreaResult trackInside(Entity entity) {
-        if (entity instanceof net.minecraft.world.entity.LivingEntity living) return trackInside(living);
+        if (entity instanceof net.minecraft.world.entity.LivingEntity living && !(entity instanceof ServerPlayer)) {
+            var cache = MOB_AREA_STATE_CACHE.computeIfAbsent(living, k -> new java.util.HashMap<>());
+            String key = getAreaKey();
+            return advance(cache.get(key), entity.tickCount, reenterThresholdTicks(), state -> cache.put(key, state));
+        }
         var cache = AREA_STATE_CACHE.computeIfAbsent(getAreaKey(), k -> new ConcurrentHashMap<>());
         UUID uuid = entity.getUUID();
         return advance(cache.get(uuid), entity.tickCount, reenterThresholdTicks(), state -> cache.put(uuid, state));
