@@ -1,5 +1,7 @@
 # Bath benefits for friendly mobs
 
+Stationary and AI-disabled mobs are checked on their normal server ticks, so receiving a benefit does not require movement.
+
 Non-hostile mobs receive the same applicable immersion effects, healing and cleansing as players, with the bath's existing wait times. This includes animals, villagers, golems and normally classified companion mobs. Custom data-pack fluids also apply their configured effects.
 
 Food restoration and advancements remain player-only. Existing thermal and undead damage rules are retained. Peony bonuses only use attributes the creature actually has, and expire after leaving the bath. Drinking and splash behavior is unchanged.

@@ -173,7 +173,10 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     @Override
     public void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
         super.entityInside(state, level, pos, entity);
-        
+        applyBathEffects(level, pos, entity);
+    }
+
+    public void applyBathEffects(Level level, BlockPos pos, Entity entity) {
         if (level.isClientSide) {
             return;
         }

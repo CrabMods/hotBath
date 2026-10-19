@@ -36,6 +36,15 @@ public final class FriendlyBathBenefits {
     @SubscribeEvent public static void onEntityTick(net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent event) {
         Entity subject=event.getEntity();
         if(!(subject instanceof LivingEntity entity)||entity instanceof Player||entity.level().isClientSide())return;
+        if(entity.isInWater()&&isEligible(entity)) {
+            var pos=entity.blockPosition();var block=entity.level().getBlockState(pos).getBlock();
+            if(block instanceof com.crabmod.hotbath.custom_fluid.DynamicCustomFluidBlock custom) {
+                custom.applyBathEffects(entity.level(),pos,entity);
+            } else if(block instanceof com.crabmod.hotbath.fluid_blocks.IInsideAreaTracker tracker) {
+                BuiltinBathDefinitions.forFluid(entity.level().getFluidState(pos).getType()).ifPresent(definition ->
+                        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe(definition.id().getPath(),entity,tracker));
+            }
+        }
         Integer previous=PEONY_EXIT_TIMERS.get(entity);
         if(previous!=null) {
             int elapsed=previous+1;var bonuses=BuiltinBathDefinitions.get("peony_bath_fluid").bath().peony();

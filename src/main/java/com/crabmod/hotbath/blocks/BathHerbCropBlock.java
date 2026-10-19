@@ -15,7 +15,7 @@ public final class BathHerbCropBlock extends BushBlock implements BonemealableBl
     public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
     private static final VoxelShape[] SHAPES = {Block.box(5,0,5,11,5,11),Block.box(3,0,3,13,9,13),
             Block.box(2,0,2,14,12,14),Block.box(1,0,1,15,15,15)};
-    
+
     public BathHerbCropBlock(Properties properties) {
         super(properties);registerDefaultState(stateDefinition.any().setValue(AGE,0));
     }
