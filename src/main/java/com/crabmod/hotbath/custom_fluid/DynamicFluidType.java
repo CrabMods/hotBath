@@ -9,6 +9,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -53,6 +56,21 @@ public class DynamicFluidType extends FluidType {
 
     public DynamicFluidType(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public Component getDescription(FluidStack stack) {
+        var definition = CustomFluidAPI.getCustomFluidDefinition(stack);
+        if (definition.isEmpty()) {
+            return Component.translatable("item.hotbath.custom_fluid.unknown");
+        }
+        var fluid = definition.get();
+        String key = fluid.getTranslationKey();
+        // Dedicated servers cannot query the client's language manager.
+        String name = FMLEnvironment.dist.isClient()
+                ? fluid.getTranslatedName()
+                : fluid.translations().getOrDefault("en_us", key);
+        return Component.translatableWithFallback(key, name);
     }
 
     @Override
