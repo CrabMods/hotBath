@@ -28,7 +28,7 @@ public class CustomFluidNetworking {
     
     private static final Gson GSON = new GsonBuilder().create();
     
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "2";
     
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(HotBath.MOD_ID, "custom_fluids"),
@@ -82,30 +82,7 @@ public class CustomFluidNetworking {
             ctx.get().enqueueWork(() -> {
                 HotBath.LOGGER.info("Received {} custom fluid definitions from server", packet.fluidJsons.size());
                 
-                // Clear existing client-side definitions (server is authoritative)
-                CustomFluidRegistry.clearClientSide();
-                
-                int successCount = 0;
-                
-                for (String json : packet.fluidJsons) {
-                    try {
-                        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
-                        CustomFluidDefinition definition = CustomFluidDefinition.CODEC
-                                .parse(JsonOps.INSTANCE, jsonObject)
-                                .resultOrPartial(error -> HotBath.LOGGER.warn("Failed to parse synced fluid: {}", error))
-                                .orElse(null);
-                        
-                        if (definition != null) {
-                            CustomFluidRegistry.registerClientSide(definition);
-                            definition.registerTranslations();
-                            successCount++;
-                        }
-                    } catch (Exception e) {
-                        HotBath.LOGGER.error("Error deserializing custom fluid from server: {}", e.getMessage());
-                    }
-                }
-                
-                HotBath.LOGGER.info("Client registered {} custom fluids from server", successCount);
+                if (!BathCatalogSync.apply(packet.fluidJsons)) return;
                 
                 // After registering all fluids, update light for all loaded custom fluid blocks
                 // This fixes the issue where fluids with luminosity > 0 would lose their light
@@ -160,11 +137,8 @@ public class CustomFluidNetworking {
         // The client can rebuild its runtime mirror while an integrated server syncs.
         Collection<CustomFluidDefinition> allFluids = CustomFluidManager.getInstance().getAllFluidDefinitions();
         
-        if (allFluids.isEmpty()) {
-            return List.of();
-        }
         
-        List<String> fluidJsons = new ArrayList<>(allFluids.size());
+        List<String> fluidJsons = new ArrayList<>(BuiltinBathDefinitions.serverJsons());
         
         for (CustomFluidDefinition definition : allFluids) {
             try {

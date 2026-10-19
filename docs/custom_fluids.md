@@ -329,3 +329,66 @@ You can provide your own grayscale textures by:
 4. **Luminosity**: Higher values (up to 15) make the fluid glow more. Use for magical or hot fluids.
 
 5. **Temperature**: Currently visual/informational only, but can be used by other mods for integration.
+
+## Override the built-in baths
+
+The six native bath behaviours are supplied as JSON inside the mod. They load automatically: no additional default data pack is required. The bundled values preserve the existing effects and balance.
+
+To customise one, copy its complete bundled file into your data pack at the same path:
+
+```text
+data/hotbath/hotbath/custom_fluids/hot_water_fluid.json
+```
+
+The other native filenames are `milk_bath_fluid.json`, `herbal_bath_fluid.json`, `honey_bath_fluid.json`, `peony_bath_fluid.json` and `rose_bath_fluid.json`. Their `id` must match the filename, for example `hotbath:hot_water_fluid`. Use the normal data-pack `pack.mcmeta` format for your Minecraft version (15 for 1.20.1, 48 for 1.21.1).
+
+These exact six IDs override existing behaviour. They retain their registered fluids, blocks, buckets and bottles, and do not create additional custom-fluid items. Other IDs continue to use the custom-fluid format documented above. The whole native file is replaced according to normal data-pack priority; definitions are not merged field by field. Start with the bundled file so that all required sections are present.
+
+Each native definition contains:
+
+| Field | Meaning |
+| --- | --- |
+| `temperature` | Bath temperature in Celsius, used by immersion temperature queries and hot/cold checks. Existing bottle integrations and other mods' consumed-item tags retain their own rules. |
+| `cleans_dirtiness` | Whether immersion in this native fluid cleans dirtiness, including supported stored-fluid containers. |
+| `splash_dirtiness_reduction` | Fraction of maximum dirtiness removed by its splash bottle on a hit; default `0.1`. |
+| `bath` | Continuous immersion effects and optional healing, hunger, cleansing, entry rewards and special native bonuses. |
+| `drink` | Effects, optional instant healing and cleansing from drinking a bottle. |
+| `splash` | Effects, optional instant healing and cleansing from a splash bottle. |
+| `pipe` | Effects and cleansing from each Create open-pipe delivery; only used when Create is installed. |
+
+The distinct profiles preserve differences between bathing, drinking, splashing and pipe delivery. For example, milk's cleansing rules and herbal instant healing are separate from potion effects. Registry properties such as density, flow, light and textures are unchanged by these native behaviour files.
+
+Every profile has an `effects` array. To replace the hot-water bath's Speed effect, replace `bath.effects` in the copied file, for example:
+
+```json
+[
+  {
+    "effect": "minecraft:haste",
+    "duration": 400,
+    "amplifier": 1,
+    "ambient": false,
+    "show_particles": false,
+    "show_icon": true,
+    "after_ticks": 100,
+    "minimum_entries": 0
+  }
+]
+```
+
+This grants Haste II after five seconds of continuous bathing, with a 20-second effect duration. The bath refreshes eligible effects while occupied, as before. An empty array disables that profile's potion effects; other configured mechanics, such as healing, remain independent. Durations and intervals use game ticks: 20 ticks equal one second. Amplifiers start at zero for level I.
+
+Optional bath mechanics are described by their bundled examples:
+
+- `healing` and `hunger`: `amount` and `interval_ticks`.
+- `cleansing`: `after_ticks`, maximum `count`, `category` (`harmful` or `non_beneficial`), `selection` (`random` or `first`), and effect-ID lists `exclude` / `include`. Exclusions take precedence; the large bundled count means all matching effects.
+- `advancement`: advancement `id` and required entry count `entries`.
+- `peony_bonuses`: attack-speed and knockback amounts, trigger time and separate linger times. This section belongs to the peony bath.
+- `undead_damage`: damage `amount` and `interval_ticks`.
+- `instant_healing`: immediate health points, used by herbal bottles.
+- `extinguish`: whether that delivery extinguishes fire; enabled in the default pipe profiles.
+
+Single deliveries (`drink`, `splash`, `pipe`) cannot wait for continuous bathing or entry counts: their effect `after_ticks` and `minimum_entries` must be zero. Continuous healing, hunger, advancement and peony/undead sections belong to `bath`.
+
+Run `/reload` after changing the pack. A malformed native definition rejects the reload with its resource ID and validation error; the previous valid native and custom catalogs stay active. Disabling the overriding pack restores the bundled defaults. Already granted potion effects expire normally; peony modifiers update their amounts and honour the configured exit times.
+
+The server owns the definitions and synchronises them on join and successful reload. Install matching updated mod builds on the server and clients. Native profiles are kept separate from the custom-fluid creative catalog during synchronisation.

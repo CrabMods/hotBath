@@ -315,7 +315,8 @@ public class DirtinessHandler {
         
         // Check if the fluid itself is a hotbath fluid (built-in or custom)
         if (!fluidState.isEmpty()) {
-            if (HotbathFluidHelper.isHotbathFluid(fluidState.getType())) {
+            if (HotbathFluidHelper.isHotbathFluid(fluidState.getType())
+                    && com.crabmod.hotbath.api.HotBathApi.isCleansingFluid(fluidState.getType())) {
                 return true;
             }
         }

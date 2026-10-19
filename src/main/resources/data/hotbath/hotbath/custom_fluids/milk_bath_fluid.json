@@ -1,0 +1,73 @@
+{
+  "id": "hotbath:milk_bath_fluid",
+  "temperature": 37.0,
+  "cleans_dirtiness": true,
+  "bath": {
+    "effects": [],
+    "healing": {
+      "amount": 0.25,
+      "interval_ticks": 40
+    },
+    "hunger": {
+      "amount": 1,
+      "interval_ticks": 300
+    },
+    "cleansing": {
+      "after_ticks": 300,
+      "count": 2147483647,
+      "category": "harmful",
+      "exclude": [
+        "minecraft:bad_omen",
+        "minecraft:unluck"
+      ],
+      "include": [],
+      "selection": "random"
+    },
+    "advancement": {
+      "id": "hotbath:milk_skin",
+      "entries": 100
+    },
+    "extinguish": false
+  },
+  "drink": {
+    "effects": [],
+    "cleansing": {
+      "after_ticks": 0,
+      "count": 1,
+      "category": "non_beneficial",
+      "exclude": [
+        "minecraft:unluck"
+      ],
+      "include": [],
+      "selection": "random"
+    },
+    "extinguish": false
+  },
+  "splash": {
+    "effects": [],
+    "cleansing": {
+      "after_ticks": 0,
+      "count": 2,
+      "category": "non_beneficial",
+      "exclude": [
+        "minecraft:unluck"
+      ],
+      "include": [],
+      "selection": "random"
+    },
+    "extinguish": false
+  },
+  "pipe": {
+    "effects": [],
+    "extinguish": true,
+    "cleansing": {
+      "after_ticks": 0,
+      "count": 1,
+      "category": "non_beneficial",
+      "selection": "first",
+      "exclude": [],
+      "include": []
+    }
+  },
+  "splash_dirtiness_reduction": 0.1
+}

@@ -1,32 +1,26 @@
 package com.crabmod.hotbath.items;
 
 import com.crabmod.hotbath.compat.*;
-import net.minecraft.core.Holder;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Drinking effects for bath water bottles
  */
 public class BathWaterEffects {
-    private static final Random RANDOM = new Random();
 
     /**
      * Hot Water Bottle Effect: Speed I for 45 seconds
      */
     public static void hotWaterEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 45 * 20, 0, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("hot_water_fluid", entity, false);
         applyDrinkTemperatureEffects(entity);
     }
 
     public static void hotWaterSplashEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30 * 20, 1, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("hot_water_fluid", entity, true);
         applySplashTemperatureEffects(entity);
     }
 
@@ -34,12 +28,14 @@ public class BathWaterEffects {
      * Honey Bath Water Effect: Absorption I for 45 seconds
      */
     public static void honeyBathEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 45 * 20, 0, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("honey_bath_fluid", entity, false);
         applyDrinkTemperatureEffects(entity);
     }
 
     public static void honeyBathSplashEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 30 * 20, 1, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("honey_bath_fluid", entity, true);
         applySplashTemperatureEffects(entity);
     }
 
@@ -47,44 +43,29 @@ public class BathWaterEffects {
      * Milk Bath Water Effect: Remove 1 random harmful effect (weakened from removing all)
      */
     public static void milkBathEffect(LivingEntity entity) {
-        removeNegativeEffects(entity, 1);
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("milk_bath_fluid", entity, false);
         applyDrinkTemperatureEffects(entity);
     }
 
     public static void milkBathSplashEffect(LivingEntity entity) {
-        removeNegativeEffects(entity, 2);
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("milk_bath_fluid", entity, true);
         applySplashTemperatureEffects(entity);
-    }
-
-    private static void removeNegativeEffects(LivingEntity entity, int count) {
-        List<MobEffectInstance> harmfulEffects = new ArrayList<>();
-        
-        for (MobEffectInstance effect : entity.getActiveEffects()) {
-            MobEffect effectHolder = effect.getEffect();
-            if (isHarmfulEffect(effectHolder) && effectHolder != MobEffects.UNLUCK) {
-                harmfulEffects.add(effect);
-            }
-        }
-        
-        for (int i = 0; i < count && !harmfulEffects.isEmpty(); i++) {
-             MobEffectInstance effectToRemove = harmfulEffects.get(RANDOM.nextInt(harmfulEffects.size()));
-             entity.removeEffect(effectToRemove.getEffect());
-             harmfulEffects.remove(effectToRemove);
-        }
     }
 
     /**
      * Herbal Bath Water Effect: Instant heal 3 hearts + Resistance I for 45 seconds
      */
     public static void herbalBathEffect(LivingEntity entity) {
-        entity.heal(6.0F); // Instant heal 3 hearts
-        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 45 * 20, 0, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("herbal_bath_fluid", entity, false);
         applyDrinkTemperatureEffects(entity);
     }
 
     public static void herbalBathSplashEffect(LivingEntity entity) {
-        entity.heal(4.0F); // Instant heal 2 hearts
-        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 30 * 20, 1, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("herbal_bath_fluid", entity, true);
         applySplashTemperatureEffects(entity);
     }
 
@@ -92,12 +73,14 @@ public class BathWaterEffects {
      * Peony Bath Water Effect: Luck I for 45 seconds
      */
     public static void peonyBathEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.LUCK, 45 * 20, 0, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("peony_bath_fluid", entity, false);
         applyDrinkTemperatureEffects(entity);
     }
 
     public static void peonyBathSplashEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.LUCK, 30 * 20, 1, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("peony_bath_fluid", entity, true);
         applySplashTemperatureEffects(entity);
     }
 
@@ -105,12 +88,14 @@ public class BathWaterEffects {
      * Rose Bath Water Effect: Strength I for 45 seconds
      */
     public static void roseBathEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 45 * 20, 0, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("rose_bath_fluid", entity, false);
         applyDrinkTemperatureEffects(entity);
     }
 
     public static void roseBathSplashEffect(LivingEntity entity) {
-        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 30 * 20, 1, false, false, true));
+        if (entity.level().isClientSide()) return;
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.use("rose_bath_fluid", entity, true);
         applySplashTemperatureEffects(entity);
     }
 
@@ -130,7 +115,7 @@ public class BathWaterEffects {
             BathWaterBottleTANModifier.applyWarmEffect(player);
         }
         
-        // Apply Cold Sweat temperature effect (20 seconds, 36°C)
+        // Apply Cold Sweat temperature effect (20 seconds, 36掳C)
         if (ColdSweatIntegration.isColdSweatLoaded()) {
             BathWaterBottleColdSweatModifier.applyWarmEffect(player);
         }
@@ -151,7 +136,7 @@ public class BathWaterEffects {
             BathWaterBottleTANModifier.applySplashWarmEffect(player);
         }
         
-        // Apply Cold Sweat temperature effect (10 seconds, 36°C)
+        // Apply Cold Sweat temperature effect (10 seconds, 36掳C)
         if (ColdSweatIntegration.isColdSweatLoaded()) {
             BathWaterBottleColdSweatModifier.applySplashWarmEffect(player);
         }
@@ -172,7 +157,7 @@ public class BathWaterEffects {
             BathWaterBottleTANModifier.applyWarmEffect(player);
         }
         
-        // Apply Cold Sweat temperature effect (20 seconds, 36°C)
+        // Apply Cold Sweat temperature effect (20 seconds, 36掳C)
         if (ColdSweatIntegration.isColdSweatLoaded()) {
             BathWaterBottleColdSweatModifier.applyWarmEffect(player);
         }
@@ -183,25 +168,4 @@ public class BathWaterEffects {
         }
     }
 
-    /**
-     * Check if effect is harmful.
-     * Uses the effect's category to determine if it's beneficial or harmful,
-     * which provides better compatibility with modded effects.
-     */
-    private static boolean isHarmfulEffect(MobEffect effectHolder) {
-        MobEffect effect = effectHolder;
-        // Use the effect's category - HARMFUL effects are negative effects
-        // This automatically supports modded effects that properly set their category
-        return !effect.isBeneficial() && effectHolder != MobEffects.UNLUCK;
-    }
 }
-
-
-
-
-
-
-
-
-
-

@@ -19,14 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("deprecation")
 @EventBusSubscriber(modid = HotBath.MOD_ID)
 public class PeonyBathEvents {
-    private static final int TICK_NUMBER = 20;
     
     // Memory cache for peony bath exit timers - avoids NBT writes every tick
     private static final Map<UUID, Integer> EXITED_TIMERS = new ConcurrentHashMap<>();
     
     // Threshold values for attribute removal
-    private static final int ATTACK_SPEED_REMOVAL_TICKS = 15 * TICK_NUMBER;
-    private static final int KNOCKBACK_REMOVAL_TICKS = 30 * TICK_NUMBER;
 
     // Method to reset invalid attributes
     private static void resetInvalidAttributes(ServerPlayer player) {
@@ -58,29 +55,34 @@ public class PeonyBathEvents {
         if (player.level().isClientSide()) return;
 
         UUID playerUUID = player.getUUID();
-        int exitedTime = EXITED_TIMERS.getOrDefault(playerUUID, 0) + 1;
+        Integer previous = EXITED_TIMERS.get(playerUUID);
+        if (previous == null) return;
+        int exitedTime = previous + 1;
+        var bonuses = com.crabmod.hotbath.custom_fluid.BuiltinBathDefinitions.get("peony_bath_fluid").bath().peony();
+        int attackExpiry = bonuses == null ? 0 : bonuses.attackSpeedLingerTicks();
+        int knockbackExpiry = bonuses == null ? 0 : bonuses.knockbackLingerTicks();
         EXITED_TIMERS.put(playerUUID, exitedTime);
 
-        // Only process at exact threshold times to avoid repeated checks
-        if (exitedTime == ATTACK_SPEED_REMOVAL_TICKS) {
+        // Honour shorter linger times after a data-pack reload as well as normal expiry.
+        if (exitedTime >= attackExpiry) {
             PeonyBathBlock.applyAttributeModifier(
                 serverPlayer,
                 Attributes.ATTACK_SPEED,
-                0.10,
+                0,
                 PeonyBathBlock.ATTACK_SPEED_MODIFIER_NAME,
                 false,
                 AttributeModifier.Operation.MULTIPLY_TOTAL);
-        } else if (exitedTime == KNOCKBACK_REMOVAL_TICKS) {
+        }
+        if (exitedTime >= knockbackExpiry) {
             PeonyBathBlock.applyAttributeModifier(
                 serverPlayer,
                 Attributes.KNOCKBACK_RESISTANCE,
-                0.05,
+                0,
                 PeonyBathBlock.KNOCKBACK_RESISTANCE_MODIFIER_NAME,
                 false,
                 AttributeModifier.Operation.ADDITION);
             
-            // Once both modifiers are removed, we can stop tracking
-            // But keep the timer high so we don't re-trigger
+            if (exitedTime >= attackExpiry) EXITED_TIMERS.remove(playerUUID);
         }
     }
     

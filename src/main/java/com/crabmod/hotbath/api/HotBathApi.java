@@ -33,7 +33,9 @@ public final class HotBathApi {
      * Checks whether a fluid may trigger Hot Bath dirtiness cleaning.
      */
     public static boolean isCleansingFluid(Fluid fluid) {
-        return isTaggedOrKnownHotBathFluid(fluid, CLEANSING_FLUIDS);
+        var builtin = com.crabmod.hotbath.custom_fluid.BuiltinBathDefinitions.forFluid(fluid);
+        return builtin.map(com.crabmod.hotbath.custom_fluid.BuiltinBathDefinition::cleansDirtiness)
+                .orElseGet(() -> isTaggedOrKnownHotBathFluid(fluid, CLEANSING_FLUIDS));
     }
 
     /**

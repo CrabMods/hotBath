@@ -59,7 +59,7 @@ public class CustomFluidHandler {
     
     /**
      * Gets the temperature of the bath fluid at the player's position.
-     * For built-in bath types, returns default hot temperature (40°C).
+     * For built-in bath types, returns default hot temperature (40鎺矯).
      * For custom fluids, returns the configured temperature.
      * 
      * @param player The player to check
@@ -83,7 +83,9 @@ public class CustomFluidHandler {
         
         // For built-in bath types, return default hot temperature
         if (block instanceof AbstractHotbathBlock) {
-            return 37.0f; // Default bath temperature
+            return com.crabmod.hotbath.custom_fluid.BuiltinBathDefinitions
+                    .forFluid(stateAtPlayerPos.getFluidState().getType(), player.level().isClientSide())
+                    .map(com.crabmod.hotbath.custom_fluid.BuiltinBathDefinition::temperature).orElse(37.0f);
         }
         
         return 0;
