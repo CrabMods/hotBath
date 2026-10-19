@@ -17,7 +17,7 @@ public class ItemRegister {
             DeferredRegister.create(ForgeRegistries.ITEMS, HotBath.MOD_ID);
 
     public static final RegistryObject<Item> BATH_HERB = ITEMS.register("bath_herb",
-            () -> new Item(new Item.Properties()));
+            () -> new com.crabmod.hotbath.items.BathHerbItem(new Item.Properties()));
 
     public static final RegistryObject<Item> HERBAL_BATH_BUCKET = ITEMS.register("herbal_bath_bucket",
             () -> new BathBucketItem(FluidsRegister.HERBAL_BATH_FLUID, new Item.Properties().stacksTo(1)));
@@ -38,7 +38,7 @@ public class ItemRegister {
             () -> new BathBucketItem(FluidsRegister.ROSE_BATH_FLUID, new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> DESCRIPTIVE_ITEM = ITEMS.register("descriptive_item",
-            () -> new com.crabmod.hotbath.items.BathHerbItem(new Item.Properties()));
+            () -> new com.crabmod.hotbath.items.DescriptiveItem(new Item.Properties()));
 
     public static final RegistryObject<Item> HOT_WATER_BOTTLE = ITEMS.register("hot_water_bottle",
             () -> new BathWaterBottleItem(new Item.Properties().stacksTo(16), BathWaterEffects::hotWaterEffect));
