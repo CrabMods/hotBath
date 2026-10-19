@@ -7,7 +7,10 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.lang.reflect.Field;
@@ -17,11 +20,16 @@ import java.lang.reflect.Field;
  * as the vanilla {@link DirtinessOverlayRenderer}. If either class changes
  * a constant without updating the other, these tests catch the drift.
  */
-@GameTestHolder("hotbath")
+@EventBusSubscriber(modid = "hotbath", value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 @PrefixGameTestTemplate(false)
 public class DirtinessRendererConsistencyTest {
 
-    @GameTest(template = "empty_1x1", timeoutTicks = 20)
+    @SubscribeEvent
+    public static void registerTests(RegisterGameTestsEvent event) {
+        event.register(DirtinessRendererConsistencyTest.class);
+    }
+
+    @GameTest(templateNamespace = "hotbath", template = "empty_1x1", timeoutTicks = 20)
     public static void test_num_patterns_match(GameTestHelper helper) {
         try {
             int vanillaPatterns = getStaticInt(DirtinessOverlayRenderer.class, "NUM_PATTERNS");
@@ -38,7 +46,7 @@ public class DirtinessRendererConsistencyTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty_1x1", timeoutTicks = 20)
+    @GameTest(templateNamespace = "hotbath", template = "empty_1x1", timeoutTicks = 20)
     public static void test_min_dirtiness_match(GameTestHelper helper) {
         try {
             float vanillaMin = getStaticFloat(DirtinessOverlayRenderer.class, "MIN_DIRTINESS");
@@ -55,7 +63,7 @@ public class DirtinessRendererConsistencyTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty_1x1", timeoutTicks = 20)
+    @GameTest(templateNamespace = "hotbath", template = "empty_1x1", timeoutTicks = 20)
     public static void test_dirt_color_match(GameTestHelper helper) {
         try {
             float efR = getStaticFloat(EpicFightDirtinessPatchedLayer.class, "DIRT_R");
@@ -77,7 +85,7 @@ public class DirtinessRendererConsistencyTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty_1x1", timeoutTicks = 20)
+    @GameTest(templateNamespace = "hotbath", template = "empty_1x1", timeoutTicks = 20)
     public static void test_dirt_textures_match(GameTestHelper helper) {
         try {
             ResourceLocation[] vanillaTextures = getStaticField(
@@ -104,7 +112,7 @@ public class DirtinessRendererConsistencyTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty_1x1", timeoutTicks = 20)
+    @GameTest(templateNamespace = "hotbath", template = "empty_1x1", timeoutTicks = 20)
     public static void test_alpha_formula_match(GameTestHelper helper) {
         // Both classes define calculateAlpha with the same formula.
         // Test at key points to catch any divergence.
