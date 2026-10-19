@@ -4,7 +4,6 @@ import com.crabmod.hotbath.HotBath;
 import com.crabmod.hotbath.items.BathBucketItem;
 import com.crabmod.hotbath.items.BathWaterBottleItem;
 import com.crabmod.hotbath.items.BathWaterEffects;
-import com.crabmod.hotbath.items.DescriptiveItem;
 import com.crabmod.hotbath.items.SplashBathWaterBottleItem;
 import com.crabmod.hotbath.items.ThrownBathWater;
 import com.crabmod.hotbath.fluid_details.FluidsColor;
@@ -63,7 +62,7 @@ public class ItemRegister {
                                     new Item.Properties().stacksTo(1)));
 
     public static final DeferredHolder<Item, Item> BATH_HERB =
-            ITEMS.register("bath_herb", () -> new DescriptiveItem(new Item.Properties()));
+            ITEMS.register("bath_herb", () -> new com.crabmod.hotbath.items.BathHerbItem(new Item.Properties()));
 
     // Bath Water Bottles
     public static final DeferredHolder<Item, Item> HOT_WATER_BOTTLE =

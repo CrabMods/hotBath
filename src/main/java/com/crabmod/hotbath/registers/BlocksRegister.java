@@ -16,6 +16,11 @@ public class BlocksRegister {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(BuiltInRegistries.BLOCK, HotBath.MOD_ID);
 
+    public static final DeferredHolder<Block, com.crabmod.hotbath.blocks.BathHerbCropBlock> BATH_HERB_CROP =
+            BLOCKS.register("bath_herb_crop", () -> new com.crabmod.hotbath.blocks.BathHerbCropBlock(
+                    net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().noCollission().instabreak().randomTicks()
+                            .sound(net.minecraft.world.level.block.SoundType.CROP)));
+
     private static <T extends Block> DeferredHolder<Block, T> registerBlock(
             String name, Supplier<T> block, CreativeModeTab tab) {
         DeferredHolder<Block, T> toReturn = BLOCKS.register(name, block);
