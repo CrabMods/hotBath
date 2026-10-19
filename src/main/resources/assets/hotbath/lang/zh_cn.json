@@ -325,5 +325,9 @@
   "hotbath.entry.custom_example.milk_tea": "温暖舒适的奶茶浴，使用$(thing)不透明度$()设置营造奶油质感。提供$(thing)饱和$()和$(thing)速度$()。还有$(thing)营养$() - 可以喝哦！",
   "hotbath.entry.custom_example.silent.title": "寂静温泉",
   "hotbath.entry.custom_example.silent": "神秘温泉，没有任何粒子、气泡或蒸汽。提供$(thing)隐身$()和$(thing)夜视$()。展示如何禁用所有视觉效果，营造宁静体验。",
-  "hotbath_tab": "热水澡"
+  "hotbath_tab": "热水澡",
+  "hotbath.settings.title": "Hot Bath 显示设置",
+  "hotbath.settings.description": "仅改变本机显示，不影响脏污机制。",
+  "hotbath.settings.dirt": "显示污垢：%s",
+  "hotbath.settings.flies": "显示苍蝇：%s"
 }

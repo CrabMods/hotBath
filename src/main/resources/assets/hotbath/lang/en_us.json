@@ -325,5 +325,9 @@
   "hotbath.entry.custom_example.milk_tea.title": "Milk Tea Bath",
   "hotbath.entry.custom_example.milk_tea": "A warm, comforting milk tea bath with $(thing)opacity$() setting for creamy look. Provides $(thing)Saturation$() and $(thing)Speed$(). Also has $(thing)nutrition: 4$() - you can drink it!",
   "hotbath.entry.custom_example.silent.title": "Silent Spring",
-  "hotbath.entry.custom_example.silent": "A mysterious hot spring with NO particles, bubbles, or steam. Provides $(thing)Invisibility$() and $(thing)Night Vision$(). Demonstrates how to disable all visual effects for a serene experience."
+  "hotbath.entry.custom_example.silent": "A mysterious hot spring with NO particles, bubbles, or steam. Provides $(thing)Invisibility$() and $(thing)Night Vision$(). Demonstrates how to disable all visual effects for a serene experience.",
+  "hotbath.settings.title": "Hot Bath Display Settings",
+  "hotbath.settings.description": "Only changes what you see.",
+  "hotbath.settings.dirt": "Show dirt: %s",
+  "hotbath.settings.flies": "Show flies: %s"
 }
