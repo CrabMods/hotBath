@@ -159,25 +159,6 @@ public class DynamicFluidType extends FluidType {
                 .orElse(DEFAULT_TEMPERATURE);
     }
     
-    /**
-     * Gets the color from the BlockEntity at the given position.
-     * Both source and flowing fluid blocks should have BlockEntities with color data.
-     * Applies the opacity from the fluid definition to the alpha channel.
-     */
-    private static int getColorFromBlockEntity(BlockAndTintGetter getter, BlockPos pos) {
-        BlockEntity be = getter.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            ResourceLocation fluidId = customBe.getFluidId();
-            if (fluidId != null) {
-                // Get color directly from registry to avoid potential issues
-                return CustomFluidRegistry.getRuntimeData(fluidId)
-                        .map(data -> data.getColorARGB())
-                        .orElse(-1);
-            }
-        }
-        return -1; // No color found
-    }
-
     @Override
     public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
         consumer.accept(new IClientFluidTypeExtensions() {
@@ -218,14 +199,10 @@ public class DynamicFluidType extends FluidType {
              */
             @Override
             public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-                // Try to get color from BlockEntity (for DynamicCustomFluidBlock)
-                int color = getColorFromBlockEntity(getter, pos);
-                if (color != -1) {
-                    return color;
-                }
-                
-                // Fallback to default
-                return DEFAULT_TINT_COLOR;
+                return getDefinition(getter, pos)
+                        .flatMap(definition -> CustomFluidRegistry.getRuntimeData(definition.id()))
+                        .map(CustomFluidRegistry.RuntimeFluidData::getColorARGB)
+                        .orElse(DEFAULT_TINT_COLOR);
             }
 
             @Override
