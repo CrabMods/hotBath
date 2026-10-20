@@ -17,6 +17,6 @@ public class HoneyBathBlock extends AbstractHotbathBlock implements IInsideAreaT
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         super.entityInside(state, level, pos, entity);
-        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("honey_bath_fluid", entity, this);
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("honey_bath_fluid", entity);
     }
 }

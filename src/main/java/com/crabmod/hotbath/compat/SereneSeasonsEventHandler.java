@@ -1,71 +1,45 @@
 package com.crabmod.hotbath.compat;
 
-import com.crabmod.hotbath.fluid_blocks.AbstractHotbathBlock;
-import net.minecraft.core.BlockPos;
+import com.crabmod.hotbath.api.HotBathApi;
+import com.crabmod.hotbath.util.CustomFluidHandler;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sereneseasons.api.season.Season;
 import sereneseasons.api.season.SeasonHelper;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 
-/**
- * Event handler for Serene Seasons integration.
- * During winter, bathing in hot baths grants extra effects:
- * - Early/Late Winter: Resistance I (10 seconds)
- * - Mid Winter: Resistance II + Regeneration I (10 seconds)
- * Effects are refreshed every 2 seconds while bathing.
- */
-public class SereneSeasonsEventHandler {
+/** Seasonal liquid benefits share the same measured contact in world fluids and containers. */
+public final class SereneSeasonsEventHandler {
+    private static final int PLAYER_INTERVAL=40;
+    private static final int MOB_INTERVAL=100;
+    private static final int DURATION=200;
+    private SereneSeasonsEventHandler() {}
 
-    private static final int CHECK_INTERVAL_TICKS = 40; // 2 seconds
-    private static final int EFFECT_DURATION_TICKS = 200; // 10 seconds
+    @SubscribeEvent public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if(event.phase==TickEvent.Phase.END&&event.player instanceof ServerPlayer player&&player.tickCount%PLAYER_INTERVAL==0)
+            CompatManager.safeEventCall("sereneseasons","onPlayerTick",()->applyWinterBenefits(player));
+    }
+    @SubscribeEvent public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+        var living=event.getEntity();
+        if(!(living instanceof Player)&&living.tickCount%MOB_INTERVAL==0)
+            CompatManager.safeEventCall("sereneseasons","onLivingTick",()->applyWinterBenefits(living));
+    }
 
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        CompatManager.safeEventCall("sereneseasons", "onPlayerTick", () -> {
-            if (event.phase != TickEvent.Phase.END) return;
-            Player player = event.player;
-
-            if (player.level().isClientSide()) return;
-            if (!(player instanceof ServerPlayer serverPlayer)) return;
-            if (!serverPlayer.isAlive()) return;
-
-            // Only check every 2 seconds
-            if (serverPlayer.tickCount % CHECK_INTERVAL_TICKS != 0) return;
-
-            // Check if player is in a hot bath
-            Level level = serverPlayer.level();
-            BlockPos playerPos = serverPlayer.blockPosition();
-            BlockState blockState = level.getBlockState(playerPos);
-
-            if (!(blockState.getBlock() instanceof AbstractHotbathBlock hotbathBlock)) return;
-            if (!hotbathBlock.isHotBath(level, playerPos)) return;
-
-            // Check season
-            Season.SubSeason subSeason = SeasonHelper.getSeasonState(level).getSubSeason();
-
-            switch (subSeason) {
-                case EARLY_WINTER, LATE_WINTER -> {
-                    // Resistance I
-                    serverPlayer.addEffect(new MobEffectInstance(
-                            MobEffects.DAMAGE_RESISTANCE, EFFECT_DURATION_TICKS, 0, false, true));
-                }
-                case MID_WINTER -> {
-                    // Resistance II + Regeneration I
-                    serverPlayer.addEffect(new MobEffectInstance(
-                            MobEffects.DAMAGE_RESISTANCE, EFFECT_DURATION_TICKS, 1, false, true));
-                    serverPlayer.addEffect(new MobEffectInstance(
-                            MobEffects.REGENERATION, EFFECT_DURATION_TICKS, 0, false, true));
-                }
-                default -> {
-                    // Not winter - no extra effects
-                }
-            }
-        });
+    private static void applyWinterBenefits(LivingEntity entity) {
+        if(entity.level().isClientSide()||!entity.isAlive()||!HotBathApi.allowsModIntegrations(entity))return;
+        var contact=HotBathApi.currentBathContact(entity);
+        if(contact.isPresent()&&!contact.get().bath())return;
+        if(!CustomFluidHandler.isEntityInHotBath(entity))return;
+        var state=SeasonHelper.getSeasonState(entity.level());
+        if(state==null||state.getSeason()!=Season.WINTER)return;
+        boolean midWinter=state.getSubSeason()==Season.SubSeason.MID_WINTER;
+        boolean ambient=!(entity instanceof Player);
+        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE,DURATION,midWinter?1:0,ambient,true,true));
+        if(midWinter)entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION,DURATION,0,ambient,true,true));
     }
 }

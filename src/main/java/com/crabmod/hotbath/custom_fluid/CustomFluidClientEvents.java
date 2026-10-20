@@ -33,7 +33,7 @@ public class CustomFluidClientEvents {
             var chunk=level.getChunkSource().getChunkNow(center.x+x,center.z+z);
             if(chunk==null)continue;
             for(var entry:chunk.getBlockEntities().entrySet()) {
-                if(entry.getValue() instanceof CustomFluidBlockEntity||entry.getValue() instanceof com.crabmod.hotbath.api.BathFluidContainer) {
+                if(entry.getValue() instanceof CustomFluidBlockEntity) {
                     var pos=entry.getKey();level.getLightEngine().checkBlock(pos);
                     var state=level.getBlockState(pos);level.sendBlockUpdated(pos,state,state,3);
                 }

@@ -82,30 +82,11 @@ public abstract class AbstractHotbathBlock extends LiquidBlock {
                 .orElseGet(this::isHotBath);
     }
 
-    private static boolean isNonTropicalAquatic(Entity entity) {
-        return (entity instanceof AbstractFish && !(entity instanceof TropicalFish)) || entity instanceof Squid;
-    }
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         super.entityInside(state, level, pos, entity);
-
-        if (isNonTropicalAquatic(entity)) {
-            entity.hurt(level.damageSources().magic(), 1.0F);
-        }
-        
-        // Twilight Forest ice mobs take damage in hot bath (1 damage per second)
-        // Only damage if this is a hot bath (temperature >= 35鎺矯)
-        if (isHotBath(level, pos) && com.crabmod.hotbath.compat.TwilightForestIntegration.isTwilightForestIceMob(entity)) {
-            // Only damage every 20 ticks (1 second) using entity tick count
-            if (entity.tickCount % 20 == 0) {
-                entity.hurt(level.damageSources().magic(), 1.0F);
-            }
-        }
-
-        // Note: Splash effects are handled by SplashSyncHandler for proper multiplayer sync
-        // Note: Player cleaning is handled gradually by DirtinessHandler.onPlayerTick()
-        // No instant bath trigger here - bathing is progressive
+        com.crabmod.hotbath.api.HotBathApi.applyLiquidHazards(entity,isHotBath(level,pos));
 
         // Bubble column physics
         int direction = getBubbleColumnDirection(level, pos);
@@ -376,15 +357,6 @@ public abstract class AbstractHotbathBlock extends LiquidBlock {
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowBubbles(Level level, BlockPos pos) {
         return true; // Default: all hardcoded hot baths show bubbles
-    }
-
-    /** Reuse world-fluid particle policy while the container supplies only its surface position. */
-    @OnlyIn(Dist.CLIENT)
-    public void animateContainedSurface(Level level,BlockPos pos,RandomSource random,double x,double surfaceY,double z) {
-        if(shouldShowSteam(level,pos)&&random.nextInt(10)==0)
-            level.addParticle(com.crabmod.hotbath.registers.ParticleRegister.STEAM_PARTICLE.get(),x,surfaceY+.02,z,0,.02,0);
-        if(shouldShowBubbles(level,pos)&&getBubbleColumnDirection(level,pos)!=0&&random.nextInt(10)==0)
-            level.addParticle(com.crabmod.hotbath.registers.ParticleRegister.HOT_WATER_BUBBLE.get(),x,surfaceY-.1,z,0,.04,0);
     }
 
     // Generate steam particles around the block if adjacent blocks are air

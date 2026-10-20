@@ -59,7 +59,7 @@ public class TwilightForestEventHandler {
             if (event.player.level().isClientSide()) return;
             if (!(event.player instanceof ServerPlayer player)) return;
             
-            boolean isInBath = CustomFluidHandler.isPlayerInHotBath(player);
+            boolean isInBath = com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBath(player);
             UUID playerId = player.getUUID();
             
             if (isInBath) {

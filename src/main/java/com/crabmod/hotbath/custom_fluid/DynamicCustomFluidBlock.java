@@ -160,7 +160,6 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
         if (be instanceof CustomFluidBlockEntity customBe) {
             return customBe.getFluidDefinition();
         }
-        if(be instanceof com.crabmod.hotbath.api.BathFluidContainer container)return container.getCustomFluidDefinition();
 
         return Optional.empty();
     }
@@ -174,57 +173,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     }
 
     public void applyImmersionEffects(Level level, BlockPos pos, Entity entity) {
-        if (level.isClientSide) {
-            return;
-        }
-        
-        if (!(entity instanceof net.minecraft.world.entity.LivingEntity player)
-                || (!(player instanceof ServerPlayer) && !com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(player))) {
-            return;
-        }
-        
-        if (!player.isAlive()) {
-            return;
-        }
-        
-        // Get fluid definition from BlockEntity
-        Optional<CustomFluidDefinition> definitionOpt = getFluidDefinition(level, pos);
-        if (definitionOpt.isEmpty()) {
-            return;
-        }
-        
-        CustomFluidDefinition definition = definitionOpt.get();
-        
-        InsideAreaResult result = trackInside(player);
-        
-        if (!result.shouldProcess()) {
-            return;
-        }
-        
-        int stayedTicks = result.stayedTicks();
-        int triggerTicks = definition.triggerTimeSeconds() * TICKS_PER_SECOND;
-        
-        // Apply effects after the trigger time has passed
-        if (stayedTicks >= triggerTicks) {
-            applyEffects(player, definition);
-        }
-    }
-
-    /**
-     * Applies configured effects to an eligible bather.
-     */
-    private void applyEffects(net.minecraft.world.entity.LivingEntity player, CustomFluidDefinition definition) {
-        List<MobEffectInstance> effects = definition.createEffectInstances();
-        for (MobEffectInstance effect : effects) {
-            player.addEffect(new MobEffectInstance(
-                    effect.getEffect(),
-                    effect.getDuration(),
-                    effect.getAmplifier(),
-                    effect.isAmbient(),
-                    effect.isVisible(),
-                    effect.showIcon()
-            ));
-        }
+        getFluidDefinition(level,pos).ifPresent(definition->com.crabmod.hotbath.api.HotBathApi.applyCustomFluidContact(entity,definition));
     }
 
     /**

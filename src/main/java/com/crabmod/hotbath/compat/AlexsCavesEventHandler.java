@@ -4,20 +4,16 @@ import com.crabmod.hotbath.HotBathConfig;
 import com.crabmod.hotbath.dirtiness.DirtinessCapability;
 import com.crabmod.hotbath.dirtiness.DirtinessData;
 import com.crabmod.hotbath.entity.HotSpringCatBehavior;
-import com.crabmod.hotbath.fluid_blocks.AbstractHotbathBlock;
-import com.crabmod.hotbath.fluid_blocks.HerbalBathBlock;
+import com.crabmod.hotbath.util.CustomFluidHandler;
 import com.github.alexmodguy.alexscaves.server.entity.living.GammaroachEntity;
 import com.github.alexmodguy.alexscaves.server.entity.living.GummyBearEntity;
 import com.github.alexmodguy.alexscaves.server.entity.living.RaycatEntity;
 import com.github.alexmodguy.alexscaves.server.potion.ACEffectRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -83,26 +79,12 @@ public class AlexsCavesEventHandler {
     // ==================== GummyBear Melting ====================
     
     private static void handleGummyBear(GummyBearEntity gummyBear) {
-        // Only check every second for performance
         if (gummyBear.tickCount % GUMMY_DAMAGE_INTERVAL != 0) return;
-        
-        // Check if gummy bear is in hot bath fluid
-        BlockPos pos = gummyBear.blockPosition();
-        Level level = gummyBear.level();
-        BlockState state = level.getBlockState(pos);
-        
-        if (state.getBlock() instanceof AbstractHotbathBlock hotbathBlock) {
-            // Only damage if the fluid is actually hot (temperature >= 35°C)
-            // This allows cool custom fluids (non-hot springs/medicine baths) to be safe
-            // For DynamicCustomFluidBlock, this will check the BlockEntity's fluid temperature
-            // For other hotbath blocks, this will return true (all built-in baths are hot)
-            if (hotbathBlock.isHotBath(level, pos)) {
-                // Hot water melts candy! Deal 0.5 damage per second
-                gummyBear.hurt(level.damageSources().magic(), 0.5F);
-            }
+        if (com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(gummyBear)&&CustomFluidHandler.isEntityInHotBathLiquid(gummyBear)) {
+            gummyBear.hurt(gummyBear.level().damageSources().magic(), 0.5F);
         }
     }
-    
+
     // ==================== Radiation Cure in Herbal Bath ====================
     
     private static void handleRadiationCure(LivingEntity living) {
@@ -114,10 +96,7 @@ public class AlexsCavesEventHandler {
         if (radiation == null) return;
 
         // Check if entity is in herbal bath
-        BlockPos pos = living.blockPosition();
-        BlockState state = living.level().getBlockState(pos);
-
-        if (state.getBlock() instanceof HerbalBathBlock) {
+        if (com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(living)&&CustomFluidHandler.isEntityInHerbalBathBlock(living)) {
             int currentLevel = radiation.getAmplifier();
             int duration = radiation.getDuration();
             

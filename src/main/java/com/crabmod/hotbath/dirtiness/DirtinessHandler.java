@@ -293,6 +293,8 @@ public class DirtinessHandler {
      * - Custom fluids from data packs (DynamicCustomFluid)
      */
     private static boolean isInHotBathFluid(ServerPlayer player) {
+        var external=com.crabmod.hotbath.api.HotBathApi.currentBathContact(player);
+        if(external.isPresent())return external.get().cleansing();
         // Check the block at player's feet position
         BlockPos feetPos = player.blockPosition();
         if (isHotbathFluidAtPosition(player, feetPos)) {

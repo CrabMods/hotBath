@@ -29,6 +29,9 @@ public class HotBathTANPlayerModifier implements IPlayerTemperatureModifier {
 
     @Override
     public TemperatureLevel modify(Player player, TemperatureLevel current) {
+        if(!com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)) {
+            cleanup(player);return current;
+        }
         // Check if the player is inside any hot bath block using the existing utility method
         boolean inBath = CustomFluidHandler.isPlayerInHotBath(player);
         long currentTime = System.currentTimeMillis();

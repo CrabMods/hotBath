@@ -88,6 +88,7 @@ public class CustomFluidNetworking {
                 // This fixes the issue where fluids with luminosity > 0 would lose their light
                 // after quitting and rejoining the game
                 CustomFluidClientEvents.refreshLoadedFluidAppearance();
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new com.crabmod.hotbath.api.BathDefinitionsChangedEvent(null));
             });
             ctx.get().setPacketHandled(true);
         }

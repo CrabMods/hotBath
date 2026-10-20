@@ -37,7 +37,7 @@ public class FarmersDelightEventHandler {
             if (!(event.player instanceof ServerPlayer player)) return;
             
             // Check if player is in any hot bath block
-            boolean isInBath = CustomFluidHandler.isPlayerInHotBath(player);
+            boolean isInBath = com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBath(player);
             
             if (isInBath) {
                 // Apply Nourishment effect every 2 seconds while in hot bath

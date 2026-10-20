@@ -1,7 +1,6 @@
 package com.crabmod.hotbath.custom_fluid;
 
 import com.crabmod.hotbath.events.enter_fluid_events.PeonyBathEvents;
-import com.crabmod.hotbath.fluid_blocks.IInsideAreaTracker;
 import com.crabmod.hotbath.fluid_blocks.PeonyBathBlock;
 import com.crabmod.hotbath.util.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -16,8 +15,11 @@ public final class BuiltinBathEffects {
     private static final Random RANDOM=new Random();
     private BuiltinBathEffects() {}
 
-    public static void bathe(String id,Entity entity,IInsideAreaTracker tracker) {
-        if(entity.level().isClientSide())return;
+    public static void bathe(String id,Entity entity) {
+        if(entity.level().isClientSide()||!entity.isAlive())return;
+        var state=com.crabmod.hotbath.bathing.BathImmersion.contact(entity,"hotbath:"+id,10);
+        if(!state.shouldProcess())return;
+        com.crabmod.hotbath.api.HotBathApi.applyLiquidHazards(entity,BuiltinBathDefinitions.get(id).isHot());
         var profile=BuiltinBathDefinitions.get(id).bath();
         if(!(entity instanceof ServerPlayer)) {
             var damage=profile.undeadDamage();
@@ -27,13 +29,10 @@ public final class BuiltinBathEffects {
         if(!(entity instanceof LivingEntity bather)||!bather.isAlive())return;
         ServerPlayer player=bather instanceof ServerPlayer p?p:null;
         if(player==null&&!com.crabmod.hotbath.entity.FriendlyBathBenefits.isEligible(bather))return;
-        var state=tracker.trackInside(bather);
-        if(!state.shouldProcess())return;
         if(profile.healing()!=null) {
-            if(player!=null)HealthRegenHandler.regenHealth(profile.healing().amount(),profile.healing().intervalTicks()/20.0,player);
-            else if((state.stayedTicks()+1)%profile.healing().intervalTicks()==0)bather.heal(profile.healing().amount());
+            if((state.stayedTicks()+1)%profile.healing().intervalTicks()==0)bather.heal(profile.healing().amount());
         }
-        if(player!=null&&profile.hunger()!=null)HungerRegenHandler.regenHunger((int)profile.hunger().amount(),profile.hunger().intervalTicks()/20.0f,player);
+        if(player!=null&&profile.hunger()!=null&&(state.stayedTicks()+1)%profile.hunger().intervalTicks()==0)player.getFoodData().eat((int)profile.hunger().amount(),0);
         apply(profile,bather,state.stayedTicks(),state.totalEnterCount());
         if(player!=null&&profile.advancement()!=null&&state.isFirstEnter()&&state.totalEnterCount()>=profile.advancement().entries())
             AdvancementHelper.tryAwardAdvancement(player,profile.advancement().id().toString(),"code_triggered");

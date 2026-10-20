@@ -27,7 +27,14 @@ public class SplashSyncHandler {
     /**
      * Track entity bath states: entityId -> BathState
      */
-    private static final Map<Integer, BathState> ENTITY_BATH_STATES = new ConcurrentHashMap<>();
+    private static final Map<Entity, BathState> ENTITY_BATH_STATES = new java.util.WeakHashMap<>();
+    private record Contact(double surfaceY,boolean splash,boolean bubbles) {}
+    private record ReportedContact(long tick,Contact contact) {}
+    private static final Map<Entity,ReportedContact> REPORTED=new java.util.WeakHashMap<>();
+    public static void clearReportedContact(Entity entity) {REPORTED.remove(entity);}
+    public static void reportContact(Entity entity,com.crabmod.hotbath.api.BathFluidProperties properties,double surfaceY) {
+        REPORTED.put(entity,new ReportedContact(entity.level().getGameTime(),new Contact(surfaceY,properties.splash(),properties.bubbles())));
+    }
     
     /**
      * Minimum ticks between splash effects for the same entity
@@ -57,8 +64,9 @@ public class SplashSyncHandler {
         }
         
         // Check if entity is currently in hot bath
-        boolean isInBath = isEntityInHotBath(entity);
-        int entityId = entity.getId();
+        var contact=contactAt(entity);
+        boolean isInBath=contact!=null;
+        Entity entityId = entity;
         long currentTime = level.getGameTime();
         
         BathState prevState = ENTITY_BATH_STATES.get(entityId);
@@ -67,8 +75,8 @@ public class SplashSyncHandler {
             // First time seeing this entity
             if (isInBath) {
                 // Entity spawned in bath or first detection
-                broadcastEnterWaterEffects(serverLevel, entity);
-                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, 0, 0,showParticles(entity)));
+                broadcastEnterWaterEffects(serverLevel, entity,contact);
+                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, 0, 0,contact.splash()));
             }
             return;
         }
@@ -77,13 +85,13 @@ public class SplashSyncHandler {
             if (!prevState.wasInBath()) {
                 // Entity just entered the bath
                 if ((currentTime - prevState.lastEnterTime()) > SPLASH_COOLDOWN_TICKS) {
-                    broadcastEnterWaterEffects(serverLevel, entity);
+                    broadcastEnterWaterEffects(serverLevel, entity,contact);
                 }
-                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, prevState.lastExitTime(), 0,showParticles(entity)));
+                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, prevState.lastExitTime(), 0,contact.splash()));
             } else {
                 // Entity still in bath - reset out-of-bath counter
-                if (prevState.ticksOutOfBath() > 0 || prevState.showSplash()!=showParticles(entity)) {
-                    ENTITY_BATH_STATES.put(entityId, new BathState(true, prevState.lastEnterTime(), prevState.lastExitTime(), 0,showParticles(entity)));
+                if (prevState.ticksOutOfBath() > 0 || prevState.showSplash()!=contact.splash()) {
+                    ENTITY_BATH_STATES.put(entityId, new BathState(true, prevState.lastEnterTime(), prevState.lastExitTime(), 0,contact.splash()));
                 }
             }
         } else {
@@ -106,7 +114,7 @@ public class SplashSyncHandler {
         }
         
         // Periodic cleanup of old entries (every ~5 minutes based on entity count)
-        if (currentTime % 6000 == (entityId % 6000)) {
+        if (currentTime % 6000 == (entity.getId() % 6000)) {
             cleanupOldEntries(currentTime);
         }
     }
@@ -114,40 +122,27 @@ public class SplashSyncHandler {
     /**
      * Check if entity is currently in a hot bath block
      */
-    private static com.crabmod.hotbath.api.BathFluidContainer containerAt(Entity entity) {
-        var bounds=entity.getBoundingBox();var pos=new BlockPos.MutableBlockPos();
-        for(int x=Mth.floor(bounds.minX);x<=Mth.floor(bounds.maxX-1e-7);x++)
-            for(int y=Mth.floor(bounds.minY);y<=Mth.floor(bounds.maxY-1e-7);y++)
-                for(int z=Mth.floor(bounds.minZ);z<=Mth.floor(bounds.maxZ-1e-7);z++)
-                    if(entity.level().getBlockEntity(pos.set(x,y,z)) instanceof com.crabmod.hotbath.api.BathFluidContainer container&&container.touchesBathFluid(bounds))return container;
+    private static Contact contactAt(Entity entity) {
+        var report=REPORTED.get(entity);
+        if(report!=null&&entity.level().getGameTime()-report.tick()<=1)return report.contact();
+        REPORTED.remove(entity);
+        for(var pos:java.util.List.of(entity.blockPosition(),entity.blockPosition().below())) {
+            var block=entity.level().getBlockState(pos).getBlock();
+            if(!(block instanceof AbstractHotbathBlock))continue;
+            java.util.Optional<com.crabmod.hotbath.custom_fluid.CustomFluidDefinition> definition=java.util.Optional.empty();
+            if(entity.level().getBlockEntity(pos) instanceof com.crabmod.hotbath.custom_fluid.CustomFluidBlockEntity custom)definition=custom.getFluidDefinition();
+            else if(block instanceof com.crabmod.hotbath.custom_fluid.CustomFluidBlock custom)definition=java.util.Optional.of(custom.getDefinition());
+            return new Contact(pos.getY()+1,definition.map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showParticles).orElse(true),
+                    definition.map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showBubbles).orElse(true));
+        }
         return null;
     }
-    private static java.util.Optional<com.crabmod.hotbath.custom_fluid.CustomFluidDefinition> definition(Entity entity) {
-        var container=containerAt(entity);if(container!=null)return container.getCustomFluidDefinition();
-        for(var pos:java.util.List.of(entity.blockPosition(),entity.blockPosition().below())) {
-            if(entity.level().getBlockEntity(pos) instanceof com.crabmod.hotbath.custom_fluid.CustomFluidBlockEntity fluid)return fluid.getFluidDefinition();
-            if(entity.level().getBlockState(pos).getBlock() instanceof com.crabmod.hotbath.custom_fluid.CustomFluidBlock fluid)return java.util.Optional.of(fluid.getDefinition());
-        }
-        return java.util.Optional.empty();
-    }
-    private static boolean showParticles(Entity entity){return definition(entity).map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showParticles).orElse(true);}
-    private static boolean showBubbles(Entity entity){return definition(entity).map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showBubbles).orElse(true);}
 
-    private static boolean isEntityInHotBath(Entity entity) {
-        BlockPos pos = entity.blockPosition();
-        Level level = entity.level();
-        
-        // Check current position and one below (in case entity is floating at surface)
-        return containerAt(entity)!=null||level.getBlockState(pos).getBlock() instanceof AbstractHotbathBlock ||
-               level.getBlockState(pos.below()).getBlock() instanceof AbstractHotbathBlock;
-    }
-    
     /**
      * Broadcast enter water effects (splash sound + particles) to all clients
      */
-    private static void broadcastEnterWaterEffects(ServerLevel serverLevel, Entity entity) {
-        var container=containerAt(entity);
-        float surfaceY=container==null?(float)Mth.floor(entity.getY())+1:(float)container.bathSurfaceY();
+    private static void broadcastEnterWaterEffects(ServerLevel serverLevel, Entity entity,Contact contact) {
+        float surfaceY=(float)contact.surfaceY();
         double entityWidth = entity.getBoundingBox().getXsize();
         
         // Calculate volume based on entity size and fall distance
@@ -170,7 +165,7 @@ public class SplashSyncHandler {
         int particleCount = Math.min((int) (baseCount * (0.5F + fallFactor * 0.5F)), 40);
         
         // Send particles in batches for network efficiency
-        if(showBubbles(entity))serverLevel.sendParticles(
+        if(contact.bubbles())serverLevel.sendParticles(
             ParticleTypes.BUBBLE,
             entity.getX(), surfaceY, entity.getZ(),
             particleCount,
@@ -178,7 +173,7 @@ public class SplashSyncHandler {
             0.1
         );
         
-        if(showParticles(entity))serverLevel.sendParticles(
+        if(contact.splash())serverLevel.sendParticles(
             ParticleTypes.SPLASH,
             entity.getX(), surfaceY, entity.getZ(),
             particleCount,
@@ -232,6 +227,12 @@ public class SplashSyncHandler {
      * This prevents memory leaks.
      */
     public static void onEntityRemoved(int entityId) {
-        ENTITY_BATH_STATES.remove(entityId);
+        ENTITY_BATH_STATES.keySet().removeIf(entity->entity.getId()==entityId);
+        REPORTED.keySet().removeIf(entity->entity.getId()==entityId);
+    }
+    @SubscribeEvent public static void leaving(net.minecraftforge.event.entity.EntityLeaveLevelEvent event) {
+        if(event.getLevel().isClientSide())return;
+        var entity=event.getEntity();ENTITY_BATH_STATES.remove(entity);REPORTED.remove(entity);
+        com.crabmod.hotbath.bathing.BathImmersion.forget(entity);
     }
 }

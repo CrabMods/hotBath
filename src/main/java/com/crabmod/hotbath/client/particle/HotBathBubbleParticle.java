@@ -18,6 +18,8 @@ import net.minecraft.tags.FluidTags;
  * naturally rise above the water surface and are visible from above.
  */
 public class HotBathBubbleParticle extends TextureSheetParticle {
+    private java.util.function.Predicate<net.minecraft.world.phys.AABB> contactBounds;
+    public void setContactBounds(java.util.function.Predicate<net.minecraft.world.phys.AABB> bounds) {contactBounds=bounds;}
 
     HotBathBubbleParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         super(level, x, y, z);
@@ -38,9 +40,7 @@ public class HotBathBubbleParticle extends TextureSheetParticle {
             BlockPos pos = BlockPos.containing(this.x, this.y, this.z);
             if (!this.level.getFluidState(pos).is(FluidTags.WATER)
                     && !(this.level.getBlockState(pos).getBlock() instanceof AbstractHotbathBlock)
-                    && !(this.level.getBlockEntity(pos) instanceof com.crabmod.hotbath.api.BathFluidContainer container
-                        &&container.getCustomFluidDefinition().map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showBubbles).orElse(true)
-                        &&container.touchesBathFluid(new net.minecraft.world.phys.AABB(this.x-.001,this.y-.001,this.z-.001,this.x+.001,this.y+.001,this.z+.001)))) {
+                    && (contactBounds==null||!contactBounds.test(new net.minecraft.world.phys.AABB(this.x-.001,this.y-.001,this.z-.001,this.x+.001,this.y+.001,this.z+.001)))) {
                 this.remove();
             }
         }

@@ -63,52 +63,9 @@ public class CustomFluidBlock extends AbstractHotbathBlock implements IInsideAre
     }
 
     @Override
-    public void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
-        super.entityInside(state, level, pos, entity);
-        
-        if (level.isClientSide) {
-            return;
-        }
-        
-        if (!(entity instanceof ServerPlayer player)) {
-            return;
-        }
-        
-        if (!player.isAlive()) {
-            return;
-        }
-        
-        InsideAreaResult result = trackInside(player);
-        
-        if (!result.shouldProcess()) {
-            return;
-        }
-        
-        int stayedTicks = result.stayedTicks();
-        int triggerTicks = definition.triggerTimeSeconds() * TICKS_PER_SECOND;
-        
-        // Apply effects after the trigger time has passed
-        if (stayedTicks >= triggerTicks) {
-            applyEffects(player);
-        }
-    }
-
-    /**
-     * Applies all configured effects to the player.
-     */
-    private void applyEffects(ServerPlayer player) {
-        List<MobEffectInstance> effects = definition.createEffectInstances();
-        for (MobEffectInstance effect : effects) {
-            // Create a fresh instance each time to avoid issues with effect stacking
-            player.addEffect(new MobEffectInstance(
-                    effect.getEffect(),
-                    effect.getDuration(),
-                    effect.getAmplifier(),
-                    effect.isAmbient(),
-                    effect.isVisible(),
-                    effect.showIcon()
-            ));
-        }
+    public void entityInside(@NotNull BlockState state,@NotNull Level level,@NotNull BlockPos pos,@NotNull Entity entity) {
+        super.entityInside(state,level,pos,entity);
+        com.crabmod.hotbath.api.HotBathApi.applyCustomFluidContact(entity,definition);
     }
 
     @Override

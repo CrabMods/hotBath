@@ -36,7 +36,7 @@ public class HotBathImmersionModifier extends TempModifier {
             Level level = entity.level();
 
             // Check if the entity is inside any bath block (hot or cold)
-            if (CustomFluidHandler.isPlayerInHotBathBlock(player)) {
+            if (com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBathBlock(player)) {
                 // Get the actual bath temperature (may vary for custom fluids)
                 float bathTempC = CustomFluidHandler.getBathTemperature(player);
                 if (bathTempC <= 0) {
