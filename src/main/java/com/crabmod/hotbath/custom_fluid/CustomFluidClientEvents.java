@@ -25,15 +25,34 @@ import java.util.Map;
  */
 @Mod.EventBusSubscriber(modid = HotBath.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class CustomFluidClientEvents {
+    public static void refreshLoadedFluidAppearance() {
+        var minecraft=net.minecraft.client.Minecraft.getInstance();var level=minecraft.level;
+        if(level==null||minecraft.player==null)return;
+        var center=minecraft.player.chunkPosition();int radius=minecraft.options.renderDistance().get();
+        for(int x=-radius;x<=radius;x++)for(int z=-radius;z<=radius;z++) {
+            var chunk=level.getChunkSource().getChunkNow(center.x+x,center.z+z);
+            if(chunk==null)continue;
+            for(var entry:chunk.getBlockEntities().entrySet()) {
+                if(entry.getValue() instanceof CustomFluidBlockEntity||entry.getValue() instanceof com.crabmod.hotbath.api.BathFluidContainer) {
+                    var pos=entry.getKey();level.getLightEngine().checkBlock(pos);
+                    var state=level.getBlockState(pos);level.sendBlockUpdated(pos,state,state,3);
+                }
+            }
+        }
+        updateAllCustomFluidLights();
+    }
+
+
+
 
     /**
      * Registers item color handlers for custom fluid items.
      * This allows the items to display with the color of the fluid they contain.
-     * 
+     *
      * Note: Smoke overlay visibility is now handled via model overrides (hot_steam predicate)
      * instead of color alpha channel, as Forge 1.20.1's translucent render type doesn't
      * properly support alpha from item tint colors.
-     * 
+     *
      * Layer structure (matching vanilla potion patterns):
      * - Bucket: layer0=bucket, layer1=fluid overlay (tinted), (layer2=smoke via model override)
      * - Bottle: layer0=potion overlay (tinted), layer1=potion bottle, (layer2=smoke via model override)
@@ -88,7 +107,7 @@ public class CustomFluidClientEvents {
     public static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityRegister.THROWN_CUSTOM_FLUID_BOTTLE.get(), ThrownItemRenderer::new);
     }
-    
+
     // Light update scheduling state — runs multiple rounds to catch late-loading chunks
     private static volatile int pendingLightRounds = 0;
     private static int pendingTickDelay = 0;

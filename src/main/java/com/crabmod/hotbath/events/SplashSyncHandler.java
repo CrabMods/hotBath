@@ -10,9 +10,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.entity.living.LivingEvent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,15 +40,15 @@ public class SplashSyncHandler {
      */
     private static final int EXIT_GRACE_TICKS = 5;
     
-    private record BathState(boolean wasInBath, long lastEnterTime, long lastExitTime, int ticksOutOfBath) {}
+    private record BathState(boolean wasInBath, long lastEnterTime, long lastExitTime, int ticksOutOfBath,boolean showSplash) {}
     
     @SubscribeEvent
     public static void onEntityTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
+        Entity entity = event.getEntity();
         Level level = entity.level();
         
-        // Only process on server side
-        if (level.isClientSide()) {
+        // Only process on server side for LivingEntities
+        if (level.isClientSide() || !(entity instanceof LivingEntity)) {
             return;
         }
         
@@ -68,7 +68,7 @@ public class SplashSyncHandler {
             if (isInBath) {
                 // Entity spawned in bath or first detection
                 broadcastEnterWaterEffects(serverLevel, entity);
-                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, 0, 0));
+                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, 0, 0,showParticles(entity)));
             }
             return;
         }
@@ -79,11 +79,11 @@ public class SplashSyncHandler {
                 if ((currentTime - prevState.lastEnterTime()) > SPLASH_COOLDOWN_TICKS) {
                     broadcastEnterWaterEffects(serverLevel, entity);
                 }
-                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, prevState.lastExitTime(), 0));
+                ENTITY_BATH_STATES.put(entityId, new BathState(true, currentTime, prevState.lastExitTime(), 0,showParticles(entity)));
             } else {
                 // Entity still in bath - reset out-of-bath counter
-                if (prevState.ticksOutOfBath() > 0) {
-                    ENTITY_BATH_STATES.put(entityId, new BathState(true, prevState.lastEnterTime(), prevState.lastExitTime(), 0));
+                if (prevState.ticksOutOfBath() > 0 || prevState.showSplash()!=showParticles(entity)) {
+                    ENTITY_BATH_STATES.put(entityId, new BathState(true, prevState.lastEnterTime(), prevState.lastExitTime(), 0,showParticles(entity)));
                 }
             }
         } else {
@@ -94,12 +94,12 @@ public class SplashSyncHandler {
                 if (newTicksOut >= EXIT_GRACE_TICKS) {
                     // Entity has been out of bath long enough - trigger exit effects
                     if ((currentTime - prevState.lastExitTime()) > SPLASH_COOLDOWN_TICKS) {
-                        broadcastExitWaterEffects(serverLevel, entity);
+                        broadcastExitWaterEffects(serverLevel, entity,prevState.showSplash());
                     }
-                    ENTITY_BATH_STATES.put(entityId, new BathState(false, prevState.lastEnterTime(), currentTime, 0));
+                    ENTITY_BATH_STATES.put(entityId, new BathState(false, prevState.lastEnterTime(), currentTime, 0,prevState.showSplash()));
                 } else {
                     // Still in grace period - update counter but keep wasInBath true
-                    ENTITY_BATH_STATES.put(entityId, new BathState(true, prevState.lastEnterTime(), prevState.lastExitTime(), newTicksOut));
+                    ENTITY_BATH_STATES.put(entityId, new BathState(true, prevState.lastEnterTime(), prevState.lastExitTime(), newTicksOut,prevState.showSplash()));
                 }
             }
             // If already out of bath, do nothing
@@ -114,12 +114,31 @@ public class SplashSyncHandler {
     /**
      * Check if entity is currently in a hot bath block
      */
+    private static com.crabmod.hotbath.api.BathFluidContainer containerAt(Entity entity) {
+        var bounds=entity.getBoundingBox();var pos=new BlockPos.MutableBlockPos();
+        for(int x=Mth.floor(bounds.minX);x<=Mth.floor(bounds.maxX-1e-7);x++)
+            for(int y=Mth.floor(bounds.minY);y<=Mth.floor(bounds.maxY-1e-7);y++)
+                for(int z=Mth.floor(bounds.minZ);z<=Mth.floor(bounds.maxZ-1e-7);z++)
+                    if(entity.level().getBlockEntity(pos.set(x,y,z)) instanceof com.crabmod.hotbath.api.BathFluidContainer container&&container.touchesBathFluid(bounds))return container;
+        return null;
+    }
+    private static java.util.Optional<com.crabmod.hotbath.custom_fluid.CustomFluidDefinition> definition(Entity entity) {
+        var container=containerAt(entity);if(container!=null)return container.getCustomFluidDefinition();
+        for(var pos:java.util.List.of(entity.blockPosition(),entity.blockPosition().below())) {
+            if(entity.level().getBlockEntity(pos) instanceof com.crabmod.hotbath.custom_fluid.CustomFluidBlockEntity fluid)return fluid.getFluidDefinition();
+            if(entity.level().getBlockState(pos).getBlock() instanceof com.crabmod.hotbath.custom_fluid.CustomFluidBlock fluid)return java.util.Optional.of(fluid.getDefinition());
+        }
+        return java.util.Optional.empty();
+    }
+    private static boolean showParticles(Entity entity){return definition(entity).map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showParticles).orElse(true);}
+    private static boolean showBubbles(Entity entity){return definition(entity).map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showBubbles).orElse(true);}
+
     private static boolean isEntityInHotBath(Entity entity) {
         BlockPos pos = entity.blockPosition();
         Level level = entity.level();
         
         // Check current position and one below (in case entity is floating at surface)
-        return level.getBlockState(pos).getBlock() instanceof AbstractHotbathBlock ||
+        return containerAt(entity)!=null||level.getBlockState(pos).getBlock() instanceof AbstractHotbathBlock ||
                level.getBlockState(pos.below()).getBlock() instanceof AbstractHotbathBlock;
     }
     
@@ -127,7 +146,8 @@ public class SplashSyncHandler {
      * Broadcast enter water effects (splash sound + particles) to all clients
      */
     private static void broadcastEnterWaterEffects(ServerLevel serverLevel, Entity entity) {
-        float surfaceY = (float) Mth.floor(entity.getY()) + 1.0F;
+        var container=containerAt(entity);
+        float surfaceY=container==null?(float)Mth.floor(entity.getY())+1:(float)container.bathSurfaceY();
         double entityWidth = entity.getBoundingBox().getXsize();
         
         // Calculate volume based on entity size and fall distance
@@ -150,7 +170,7 @@ public class SplashSyncHandler {
         int particleCount = Math.min((int) (baseCount * (0.5F + fallFactor * 0.5F)), 40);
         
         // Send particles in batches for network efficiency
-        serverLevel.sendParticles(
+        if(showBubbles(entity))serverLevel.sendParticles(
             ParticleTypes.BUBBLE,
             entity.getX(), surfaceY, entity.getZ(),
             particleCount,
@@ -158,7 +178,7 @@ public class SplashSyncHandler {
             0.1
         );
         
-        serverLevel.sendParticles(
+        if(showParticles(entity))serverLevel.sendParticles(
             ParticleTypes.SPLASH,
             entity.getX(), surfaceY, entity.getZ(),
             particleCount,
@@ -170,7 +190,7 @@ public class SplashSyncHandler {
     /**
      * Broadcast exit water effects (exit sound) to all clients
      */
-    private static void broadcastExitWaterEffects(ServerLevel serverLevel, Entity entity) {
+    private static void broadcastExitWaterEffects(ServerLevel serverLevel, Entity entity,boolean showSplash) {
         double entityWidth = entity.getBoundingBox().getXsize();
         float volume = Math.min(0.8F, (float) entityWidth * 0.4F);
         
@@ -186,7 +206,7 @@ public class SplashSyncHandler {
         
         // Small splash particles when exiting
         int particleCount = Math.min((int) (entityWidth * 8.0F), 15);
-        serverLevel.sendParticles(
+        if(showSplash)serverLevel.sendParticles(
             ParticleTypes.SPLASH,
             entity.getX(), entity.getY() + 0.5, entity.getZ(),
             particleCount,

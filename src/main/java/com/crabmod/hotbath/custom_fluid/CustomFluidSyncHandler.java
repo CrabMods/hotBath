@@ -55,7 +55,24 @@ public class CustomFluidSyncHandler {
             CustomFluidNetworking.syncToClient(event.getPlayer());
         } else {
             // Sync to all players (data pack reload via /reload)
+            refreshLoadedBathLights(event.getPlayerList().getServer());
             CustomFluidNetworking.syncToAllClients(event.getPlayerList().getPlayers());
+        }
+    }
+    private static void refreshLoadedBathLights(net.minecraft.server.MinecraftServer server) {
+        for(var level:server.getAllLevels()) {
+            var chunks=(com.crabmod.hotbath.mixin.ChunkMapAccessor)level.getChunkSource().chunkMap;
+            for(var holder:chunks.hotbath$loadedChunks()) {
+                var result=holder.getFullChunkFuture().getNow(null);
+                var chunk=result==null?null:result.left().orElse(null);if(chunk==null)continue;
+                for(var entry:chunk.getBlockEntities().entrySet()) {
+                    if(entry.getValue() instanceof com.crabmod.hotbath.api.BathFluidContainer container)container.refreshBathDefinition();
+                    else if(entry.getValue() instanceof CustomFluidBlockEntity) {
+                        level.getLightEngine().checkBlock(entry.getKey());
+                        var state=level.getBlockState(entry.getKey());level.sendBlockUpdated(entry.getKey(),state,state,3);
+                    }
+                }
+            }
         }
     }
 }

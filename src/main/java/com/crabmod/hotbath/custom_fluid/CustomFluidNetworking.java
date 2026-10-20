@@ -87,7 +87,7 @@ public class CustomFluidNetworking {
                 // After registering all fluids, update light for all loaded custom fluid blocks
                 // This fixes the issue where fluids with luminosity > 0 would lose their light
                 // after quitting and rejoining the game
-                CustomFluidClientEvents.updateAllCustomFluidLights();
+                CustomFluidClientEvents.refreshLoadedFluidAppearance();
             });
             ctx.get().setPacketHandled(true);
         }

@@ -106,6 +106,7 @@ public class DynamicFluidType extends FluidType {
         if (be instanceof CustomFluidBlockEntity customBe) {
             return customBe.getFluidDefinition();
         }
+        if(be instanceof com.crabmod.hotbath.api.BathFluidContainer container)return container.getCustomFluidDefinition();
         return Optional.empty();
     }
     
@@ -159,6 +160,22 @@ public class DynamicFluidType extends FluidType {
                 .orElse(DEFAULT_TEMPERATURE);
     }
     
+    @Override public int getLightLevel(FluidStack stack) {
+        return CustomFluidAPI.getCustomFluidDefinition(stack).map(CustomFluidDefinition::luminosity).orElse(DEFAULT_LIGHT_LEVEL);
+    }
+
+    @Override public int getDensity(FluidStack stack) {
+        return CustomFluidAPI.getCustomFluidDefinition(stack).map(CustomFluidDefinition::density).orElse(DEFAULT_DENSITY);
+    }
+
+    @Override public int getViscosity(FluidStack stack) {
+        return CustomFluidAPI.getCustomFluidDefinition(stack).map(CustomFluidDefinition::viscosity).orElse(DEFAULT_VISCOSITY);
+    }
+
+    @Override public int getTemperature(FluidStack stack) {
+        return CustomFluidAPI.getCustomFluidDefinition(stack).map(def->(int)(def.temperature()+273)).orElse(DEFAULT_TEMPERATURE);
+    }
+
     @Override
     public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
         consumer.accept(new IClientFluidTypeExtensions() {
@@ -170,6 +187,24 @@ public class DynamicFluidType extends FluidType {
             @Override
             public ResourceLocation getFlowingTexture() {
                 return CUSTOM_FLUID_FLOWING_RL;
+            }
+
+            @Override
+            public ResourceLocation getStillTexture(FluidState state,BlockAndTintGetter getter,BlockPos pos) {
+                return getDefinition(getter,pos).map(CustomFluidDefinition::textureStill).orElse(CUSTOM_FLUID_STILL_RL);
+            }
+            @Override
+            public ResourceLocation getStillTexture(FluidStack stack) {
+                return CustomFluidAPI.getCustomFluidDefinition(stack).map(CustomFluidDefinition::textureStill).orElse(CUSTOM_FLUID_STILL_RL);
+            }
+
+            @Override
+            public ResourceLocation getFlowingTexture(FluidState state,BlockAndTintGetter getter,BlockPos pos) {
+                return getDefinition(getter,pos).map(CustomFluidDefinition::textureFlowing).orElse(CUSTOM_FLUID_FLOWING_RL);
+            }
+            @Override
+            public ResourceLocation getFlowingTexture(FluidStack stack) {
+                return CustomFluidAPI.getCustomFluidDefinition(stack).map(CustomFluidDefinition::textureFlowing).orElse(CUSTOM_FLUID_FLOWING_RL);
             }
 
             @Override

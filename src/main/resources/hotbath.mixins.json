@@ -5,7 +5,15 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "hotbath.refmap.json",
   "plugin": "com.crabmod.hotbath.mixin.HotBathMixinPlugin",
-  "mixins": ["accessor.ItemAccessor", "BottleItemMixin", "EmptyBucketCapabilityMixin", "EntityMixin", "FishingHookMixin", "PointedDripstoneMixin"],
+  "mixins": [
+    "accessor.ItemAccessor",
+    "BottleItemMixin",
+    "EmptyBucketCapabilityMixin",
+    "EntityMixin",
+    "FishingHookMixin",
+    "PointedDripstoneMixin",
+    "ChunkMapAccessor"
+  ],
   "client": [],
   "injectors": {
     "defaultRequire": 1

@@ -66,14 +66,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
      */
     @Override
     public boolean isHotBath(Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            // Check if the fluid definition exists and has hot temperature
-            return customBe.isHot();
-        }
-        // BlockEntity not found - this can happen for flowing fluid blocks that haven't synced yet
-        // Default to cold (safe) to avoid unintended damage
-        return false;
+        return getFluidDefinition(level,pos).map(CustomFluidDefinition::isHot).orElse(false);
     }
     
     /**
@@ -167,8 +160,12 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
         if (be instanceof CustomFluidBlockEntity customBe) {
             return customBe.getFluidDefinition();
         }
+        if(be instanceof com.crabmod.hotbath.api.BathFluidContainer container)return container.getCustomFluidDefinition();
+
         return Optional.empty();
     }
+
+
 
     @Override
     public void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
@@ -237,11 +234,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     @Override
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowSteam(Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            return customBe.shouldShowSteam();
-        }
-        return false; // No BlockEntity means no steam
+        return getFluidDefinition(level,pos).map(def->def.isHot()&&def.showSteam()).orElse(false);
     }
     
     /**
@@ -251,11 +244,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     @Override
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowBubbles(Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            return customBe.shouldShowBubbles();
-        }
-        return true; // Default to showing bubbles
+        return getFluidDefinition(level,pos).map(CustomFluidDefinition::showBubbles).orElse(false);
     }
 
     /**

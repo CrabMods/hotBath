@@ -86,6 +86,6 @@ public final class HotBathApi {
     }
 
     private static TagKey<Fluid> fluidTag(String name) {
-        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(HotBath.MOD_ID, name));
+        return TagKey.create(Registries.FLUID, new ResourceLocation(HotBath.MOD_ID, name));
     }
 }

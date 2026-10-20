@@ -63,6 +63,8 @@ public record CustomFluidDefinition(
         String nameKey,
         Map<String, String> translations
 ) {
+    public static final float HOT_TEMPERATURE_THRESHOLD=35.0f;
+
     
     /** Default saturation modifier for nutrition calculation (same as normal food) */
     private static final float DEFAULT_SATURATION_MODIFIER = 0.6f;
@@ -188,7 +190,7 @@ public record CustomFluidDefinition(
      * Hot fluids cause damage to ice mobs and GummyBear from Alex's Caves.
      */
     public boolean isHot() {
-        return temperature >= 35.0f;
+        return temperature >= HOT_TEMPERATURE_THRESHOLD;
     }
 
     /**
