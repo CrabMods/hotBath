@@ -181,53 +181,6 @@ public class DynamicFluidType extends FluidType {
                 .orElse(DEFAULT_TEMPERATURE);
     }
     
-    /**
-     * Gets the color from the BlockEntity at the given position.
-     * Both source and flowing fluid blocks should have BlockEntities with color data.
-     * Applies the opacity from the fluid definition to the alpha channel.
-     */
-    private static int getColorFromBlockEntity(BlockAndTintGetter getter, BlockPos pos) {
-        BlockEntity be = getter.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            int color = customBe.getFluidColor();
-            if (color != 0) {
-                // Get opacity from definition, default to 1.0 (fully opaque)
-                float opacity = customBe.getFluidDefinition()
-                        .map(CustomFluidDefinition::opacity)
-                        .orElse(1.0f);
-                int alpha = (int)(opacity * 255) & 0xFF;
-                return (alpha << 24) | (color & 0x00FFFFFF);
-            }
-        }
-        return -1; // No color found
-    }
-    
-    /**
-     * Gets the color from waterlogging storage (for waterlogged blocks).
-     * Applies the opacity from the fluid definition to the alpha channel.
-     */
-    private static int getColorFromWaterlogging(BlockAndTintGetter getter, BlockPos pos) {
-        // Check if this is a waterlogged block with our custom fluid
-        BlockState state = getter.getBlockState(pos);
-        if (state.hasProperty(BlockStateProperties.WATERLOGGED) 
-                && state.getValue(BlockStateProperties.WATERLOGGED)) {
-            // Get the custom fluid ID from waterlogging storage
-            ResourceLocation customFluidId = HotbathWaterloggingHelper.getStoredCustomFluidIdClientDirect(pos);
-            if (customFluidId != null) {
-                // Look up the fluid definition to get its color and opacity
-                Optional<CustomFluidDefinition> defOpt = CustomFluidAPI.getFluidDefinition(customFluidId);
-                if (defOpt.isPresent()) {
-                    CustomFluidDefinition def = defOpt.get();
-                    int color = def.color();
-                    float opacity = def.opacity();
-                    int alpha = (int)(opacity * 255) & 0xFF;
-                    return (alpha << 24) | (color & 0x00FFFFFF);
-                }
-            }
-        }
-        return -1; // No color found
-    }
-
     @SuppressWarnings("removal")
     @Override
     public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
@@ -271,20 +224,10 @@ public class DynamicFluidType extends FluidType {
              */
             @Override
             public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-                // First try to get color from BlockEntity (for DynamicCustomFluidBlock)
-                int color = getColorFromBlockEntity(getter, pos);
-                if (color != -1) {
-                    return color;
-                }
-                
-                // Then try to get color from waterlogging storage (for waterlogged blocks)
-                color = getColorFromWaterlogging(getter, pos);
-                if (color != -1) {
-                    return color;
-                }
-                
-                // Fallback to default
-                return DEFAULT_TINT_COLOR;
+                return getDefinition(getter, pos)
+                        .flatMap(definition -> CustomFluidRegistry.getRuntimeData(definition.id()))
+                        .map(CustomFluidRegistry.RuntimeFluidData::getColorARGB)
+                        .orElse(DEFAULT_TINT_COLOR);
             }
 
             @Override
