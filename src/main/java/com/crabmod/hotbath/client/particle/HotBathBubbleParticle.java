@@ -35,7 +35,10 @@ public class HotBathBubbleParticle extends TextureSheetParticle {
             this.yd *= 0.85F;
             this.zd *= 0.85F;
             if (!this.level.getFluidState(BlockPos.containing(this.x, this.y, this.z)).is(FluidTags.WATER) && 
-                !(this.level.getBlockState(BlockPos.containing(this.x, this.y, this.z)).getBlock() instanceof AbstractHotbathBlock)) {
+                !(this.level.getBlockState(BlockPos.containing(this.x, this.y, this.z)).getBlock() instanceof AbstractHotbathBlock) &&
+                !(this.level.getBlockEntity(BlockPos.containing(this.x,this.y,this.z)) instanceof com.crabmod.hotbath.api.BathFluidContainer container
+                        &&container.getCustomFluidDefinition().map(com.crabmod.hotbath.custom_fluid.CustomFluidDefinition::showBubbles).orElse(true)
+                        &&container.touchesBathFluid(new net.minecraft.world.phys.AABB(this.x-.001,this.y-.001,this.z-.001,this.x+.001,this.y+.001,this.z+.001)))) {
                 this.remove();
             }
         }

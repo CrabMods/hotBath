@@ -180,4 +180,11 @@ public class CustomFluidBlock extends AbstractHotbathBlock implements IInsideAre
     public boolean shouldShowSteam() {
         return definition.isHot() && definition.showSteam();
     }
+
+    @Override protected boolean shouldShowSteam(Level level,BlockPos pos) {
+        return shouldShowSteam();
+    }
+    @Override protected boolean shouldShowBubbles(Level level,BlockPos pos) {
+        return shouldShowBubbles();
+    }
 }

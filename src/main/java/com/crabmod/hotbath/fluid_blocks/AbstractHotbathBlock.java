@@ -382,22 +382,31 @@ public abstract class AbstractHotbathBlock extends LiquidBlock {
 
     /**
      * Determines if steam particles should be shown for this fluid block.
-     * Default returns true for hardcoded hot bath blocks.
+     * Built-in steam follows the existing reloadable temperature definition.
      * Can be overridden by subclasses (e.g., DynamicCustomFluidBlock) to check temperature.
      */
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowSteam(Level level, BlockPos pos) {
-        return true; // Default: all hardcoded hot baths show steam
+        return isHotBath(level, pos);
     }
     
     /**
      * Determines if bubble particles should be shown for this fluid block.
-     * Default returns true for hardcoded hot bath blocks.
+     * Custom fluids use their existing show_bubbles setting.
      * Can be overridden by subclasses (e.g., DynamicCustomFluidBlock) to check showBubbles setting.
      */
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowBubbles(Level level, BlockPos pos) {
         return true; // Default: all hardcoded hot baths show bubbles
+    }
+
+    /** Reuse world-fluid particle policy while the container supplies only its surface position. */
+    @OnlyIn(Dist.CLIENT)
+    public void animateContainedSurface(Level level,BlockPos pos,RandomSource random,double x,double surfaceY,double z) {
+        if(shouldShowSteam(level,pos)&&random.nextInt(10)==0)
+            level.addParticle(com.crabmod.hotbath.registers.ParticleRegister.STEAM_PARTICLE.get(),x,surfaceY+.02,z,0,.02,0);
+        if(shouldShowBubbles(level,pos)&&getBubbleColumnDirection(level,pos)!=0&&random.nextInt(10)==0)
+            level.addParticle(com.crabmod.hotbath.registers.ParticleRegister.HOT_WATER_BUBBLE.get(),x,surfaceY-.1,z,0,.04,0);
     }
 
     // Generate steam particles around the block if adjacent blocks are air

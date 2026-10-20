@@ -21,7 +21,8 @@
     "BaseCoralWallFanBlockMixin",
     "CoralPlantBlockMixin",
     "CoralFanBlockMixin",
-    "CoralWallFanBlockMixin"
+    "CoralWallFanBlockMixin",
+    "ChunkMapAccessor"
   ],
   "client": [
     "client.BlockRenderDispatcherMixin",

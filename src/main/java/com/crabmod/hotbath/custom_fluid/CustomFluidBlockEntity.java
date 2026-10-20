@@ -303,7 +303,7 @@ public class CustomFluidBlockEntity extends BlockEntity {
     private void scheduleLightUpdate() {
         if (level != null && fluidId != null) {
             Optional<CustomFluidDefinition> defOpt = getFluidDefinition();
-            if (defOpt.isPresent() && defOpt.get().luminosity() > 2) {
+            if (defOpt.isPresent()) {
                 // Trigger light engine to recompute light at this position
                 level.getLightEngine().checkBlock(worldPosition);
             }

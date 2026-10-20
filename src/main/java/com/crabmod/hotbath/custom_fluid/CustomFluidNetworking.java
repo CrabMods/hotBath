@@ -74,6 +74,7 @@ public class CustomFluidNetworking {
             HotBath.LOGGER.info("Received {} custom fluid definitions from server", payload.fluidJsons().size());
             
             if (!BathCatalogSync.apply(payload.fluidJsons())) return;
+            CustomFluidClientEvents.refreshLoadedFluidAppearance();
         });
     }
     

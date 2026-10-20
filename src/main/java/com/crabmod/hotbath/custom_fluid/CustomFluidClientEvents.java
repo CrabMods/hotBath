@@ -15,12 +15,31 @@ import com.crabmod.hotbath.registers.EntityRegister;
  */
 @EventBusSubscriber(modid = HotBath.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class CustomFluidClientEvents {
+    public static void refreshLoadedFluidAppearance() {
+        var minecraft=net.minecraft.client.Minecraft.getInstance();var level=minecraft.level;
+        if(level==null||minecraft.player==null)return;
+        var center=minecraft.player.chunkPosition();int radius=minecraft.options.renderDistance().get();
+        for(int x=-radius;x<=radius;x++)for(int z=-radius;z<=radius;z++) {
+            var chunk=level.getChunkSource().getChunkNow(center.x+x,center.z+z);
+            if(chunk==null)continue;
+            for(var entry:chunk.getBlockEntities().entrySet()) {
+                if(entry.getValue() instanceof CustomFluidBlockEntity||entry.getValue() instanceof com.crabmod.hotbath.api.BathFluidContainer) {
+                    var pos=entry.getKey();level.getLightEngine().checkBlock(pos);
+                    var state=level.getBlockState(pos);level.sendBlockUpdated(pos,state,state,3);
+                }
+            }
+        }
+
+    }
+
+
+
 
     /**
      * Registers item color handlers for custom fluid items.
      * This allows the items to display with the color of the fluid they contain.
      * Also handles smoke overlay visibility - only shown for hot fluids.
-     * 
+     *
      * Layer structure (matching vanilla potion patterns):
      * - Bucket: layer0=bucket, layer1=fluid overlay (tinted), layer2=smoke
      * - Bottle: layer0=potion overlay (tinted), layer1=potion bottle, layer2=smoke

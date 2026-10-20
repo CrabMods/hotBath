@@ -72,12 +72,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
      */
     @Override
     public boolean isHotBath(Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            // Use isHot() which correctly defaults to false if no definition found
-            return customBe.isHot();
-        }
-        return false; // Default to cold if BlockEntity not found
+        return getFluidDefinition(level,pos).map(CustomFluidDefinition::isHot).orElse(false);
     }
     
     /**
@@ -208,6 +203,8 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
             return customBe.getFluidDefinition();
         }
 
+        if(be instanceof com.crabmod.hotbath.api.BathFluidContainer container)return container.getCustomFluidDefinition();
+
         ResourceLocation customFluidId = HotbathWaterloggingHelper.getStoredCustomFluidId(level, pos);
         return customFluidId == null
                 ? Optional.empty()
@@ -280,11 +277,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     @Override
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowSteam(Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            return customBe.shouldShowSteam();
-        }
-        return false; // No BlockEntity means no steam
+        return getFluidDefinition(level,pos).map(def->def.isHot()&&def.showSteam()).orElse(false);
     }
     
     /**
@@ -294,11 +287,7 @@ public class DynamicCustomFluidBlock extends AbstractHotbathBlock implements Ent
     @Override
     @OnlyIn(Dist.CLIENT)
     protected boolean shouldShowBubbles(Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof CustomFluidBlockEntity customBe) {
-            return customBe.shouldShowBubbles();
-        }
-        return true; // Default to showing bubbles
+        return getFluidDefinition(level,pos).map(CustomFluidDefinition::showBubbles).orElse(false);
     }
 
     /**
