@@ -36,7 +36,7 @@ public class FarmersDelightEventHandler {
             if (event.getEntity().level().isClientSide()) return;
             if (!(event.getEntity() instanceof ServerPlayer player)) return;
             
-            boolean isInBath = CustomFluidHandler.isPlayerInHotBath(player);
+            boolean isInBath = com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBath(player);
             
             if (isInBath) {
                 if (player.tickCount % EFFECT_APPLY_INTERVAL == 0) {

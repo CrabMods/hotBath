@@ -32,7 +32,7 @@ public class PeonyBathBlock extends AbstractHotbathBlock implements IInsideAreaT
 
     @Override
     protected void applyBathEffects(Level level, BlockPos pos, Entity entity) {
-        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("peony_bath_fluid", entity, this);
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("peony_bath_fluid", entity);
     }
 
     public static void applyAttributeModifier(

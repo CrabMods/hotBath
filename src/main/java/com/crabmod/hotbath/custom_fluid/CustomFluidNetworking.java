@@ -75,6 +75,7 @@ public class CustomFluidNetworking {
             
             if (!BathCatalogSync.apply(payload.fluidJsons())) return;
             CustomFluidClientEvents.refreshLoadedFluidAppearance();
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new com.crabmod.hotbath.api.BathDefinitionsChangedEvent(null));
         });
     }
     

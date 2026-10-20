@@ -18,7 +18,7 @@ public class BathWaterBottleLSOModifier {
      */
     public static void applyWarmEffect(Player player) {
         // Check if player is in hot bath for boosted effect
-        boolean isBathing = CustomFluidHandler.isPlayerInHotBathBlock(player);
+        boolean isBathing = com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBathBlock(player);
         
         LSOApiHelper.applyBottleTemperatureEffect(player, isBathing);
     }

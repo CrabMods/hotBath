@@ -42,6 +42,7 @@ public class CustomFluidSyncHandler {
         } else {
             // Sync to all players (data pack reload via /reload)
             refreshLoadedBathLights(event.getPlayerList().getServer());
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new com.crabmod.hotbath.api.BathDefinitionsChangedEvent(event.getPlayerList().getServer()));
             CustomFluidNetworking.syncToAllClients(event.getPlayerList().getPlayers());
         }
     }
@@ -52,8 +53,7 @@ public class CustomFluidSyncHandler {
                 var result=holder.getFullChunkFuture().getNow(null);
                 var chunk=result==null?null:result.orElse(null);if(chunk==null)continue;
                 for(var entry:chunk.getBlockEntities().entrySet()) {
-                    if(entry.getValue() instanceof com.crabmod.hotbath.api.BathFluidContainer container)container.refreshBathDefinition();
-                    else if(entry.getValue() instanceof CustomFluidBlockEntity) {
+                    if(entry.getValue() instanceof CustomFluidBlockEntity) {
                         level.getLightEngine().checkBlock(entry.getKey());
                         var state=level.getBlockState(entry.getKey());level.sendBlockUpdated(entry.getKey(),state,state,3);
                     }

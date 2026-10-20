@@ -106,7 +106,6 @@ public class DynamicFluidType extends FluidType {
         if (be instanceof CustomFluidBlockEntity customBe) {
             return customBe.getFluidDefinition();
         }
-        if(be instanceof com.crabmod.hotbath.api.BathFluidContainer container)return container.getCustomFluidDefinition();
         return Optional.empty();
     }
     

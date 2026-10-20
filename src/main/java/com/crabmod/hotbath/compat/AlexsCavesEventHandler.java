@@ -4,17 +4,14 @@ import com.crabmod.hotbath.HotBathConfig;
 import com.crabmod.hotbath.dirtiness.DirtinessAttachment;
 import com.crabmod.hotbath.dirtiness.DirtinessData;
 import com.crabmod.hotbath.entity.HotSpringCatBehavior;
-import com.crabmod.hotbath.fluid_blocks.AbstractHotbathBlock;
-import com.crabmod.hotbath.fluid_blocks.HerbalBathBlock;
+import com.crabmod.hotbath.util.CustomFluidHandler;
 import com.github.alexmodguy.alexscaves.server.entity.living.GammaroachEntity;
 import com.github.alexmodguy.alexscaves.server.entity.living.GummyBearEntity;
 import com.github.alexmodguy.alexscaves.server.entity.living.RaycatEntity;
 import com.github.alexmodguy.alexscaves.server.potion.ACEffectRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -62,14 +59,8 @@ public class AlexsCavesEventHandler {
             // Only check every second for performance
             if (gummyBear.tickCount % GUMMY_DAMAGE_INTERVAL != 0) return;
             
-            // Check if gummy bear is in hot bath fluid
-            BlockPos pos = gummyBear.blockPosition();
-            BlockState state = gummyBear.level().getBlockState(pos);
-            
-            if (state.getBlock() instanceof AbstractHotbathBlock hotbathBlock) {
-                if (hotbathBlock.isHotBath(gummyBear.level(), pos)) {
-                    gummyBear.hurt(gummyBear.level().damageSources().magic(), 0.5F);
-                }
+            if (com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(gummyBear)&&CustomFluidHandler.isEntityInHotBathLiquid(gummyBear)) {
+                gummyBear.hurt(gummyBear.level().damageSources().magic(), 0.5F);
             }
         });
     }
@@ -91,10 +82,7 @@ public class AlexsCavesEventHandler {
             MobEffectInstance radiation = living.getEffect(ACEffectRegistry.IRRADIATED);
             if (radiation == null) return;
             
-            BlockPos pos = living.blockPosition();
-            BlockState state = living.level().getBlockState(pos);
-            
-            if (state.getBlock() instanceof HerbalBathBlock) {
+            if (com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(living)&&CustomFluidHandler.isEntityInHerbalBathBlock(living)) {
                 int currentLevel = radiation.getAmplifier();
                 int duration = radiation.getDuration();
                 

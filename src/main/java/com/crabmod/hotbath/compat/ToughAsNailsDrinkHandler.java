@@ -32,7 +32,7 @@ public class ToughAsNailsDrinkHandler {
             }
             
             // Check if player is in any hot bath block
-            if (CustomFluidHandler.isPlayerInHotBath(player)) {
+            if (com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBath(player)) {
                 BathWaterEffects.applyTemperatureEffectsOnly(player);
                 
                 // If LSO is loaded, also restore thirst

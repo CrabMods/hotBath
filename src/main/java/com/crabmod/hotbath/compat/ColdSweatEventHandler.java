@@ -76,7 +76,8 @@ public class ColdSweatEventHandler {
             boolean traitIsWorld = event.getTrait() == Temperature.Trait.WORLD;
             boolean entityIsPlayer = event.getEntity() instanceof Player;
             boolean playerIsInHotBathBlock =
-                    entityIsPlayer && CustomFluidHandler.isPlayerInHotBathBlock((Player) event.getEntity());
+                    entityIsPlayer && com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(event.getEntity())
+                    && CustomFluidHandler.isPlayerInHotBathBlock((Player) event.getEntity());
 
             if (ColdSweatImmersionGate.shouldNeutralizeWaterTempModifier(
                     modifierIsWaterTempModifier,

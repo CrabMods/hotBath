@@ -17,6 +17,6 @@ public class RoseBathBlock extends AbstractHotbathBlock implements IInsideAreaTr
 
     @Override
     protected void applyBathEffects(Level level, BlockPos pos, Entity entity) {
-        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("rose_bath_fluid", entity, this);
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("rose_bath_fluid", entity);
     }
 }

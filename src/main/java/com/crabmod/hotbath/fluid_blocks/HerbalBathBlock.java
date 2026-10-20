@@ -17,6 +17,6 @@ public class HerbalBathBlock extends AbstractHotbathBlock implements IInsideArea
 
     @Override
     protected void applyBathEffects(Level level, BlockPos pos, Entity entity) {
-        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("herbal_bath_fluid", entity, this);
+        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe("herbal_bath_fluid", entity);
     }
 }

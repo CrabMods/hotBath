@@ -42,7 +42,7 @@ public final class FriendlyBathBenefits {
                 custom.applyImmersionEffects(entity.level(),pos,entity);
             } else if(block instanceof com.crabmod.hotbath.fluid_blocks.IInsideAreaTracker tracker) {
                 BuiltinBathDefinitions.forFluid(entity.level().getFluidState(pos).getType()).ifPresent(definition ->
-                        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe(definition.id().getPath(),entity,tracker));
+                        com.crabmod.hotbath.custom_fluid.BuiltinBathEffects.bathe(definition.id().getPath(),entity));
             } else { com.crabmod.hotbath.waterlogging.WaterloggedBathEffectsHandler.applyToMob(entity); }
         }
         Integer previous=PEONY_EXIT_TIMERS.get(entity);
@@ -58,7 +58,7 @@ public final class FriendlyBathBenefits {
     @SubscribeEvent public static void onLeaveLevel(net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent event) {
         Entity subject=event.getEntity();
         if(!(subject instanceof LivingEntity entity)||entity instanceof Player||entity.level().isClientSide())return;
-        com.crabmod.hotbath.fluid_blocks.IInsideAreaTracker.MOB_AREA_STATE_CACHE.remove(entity);
+        com.crabmod.hotbath.bathing.BathImmersion.forget(entity);
         if(PEONY_EXIT_TIMERS.remove(entity)!=null) {
             PeonyBathBlock.applyAttributeModifier(entity,Attributes.ATTACK_SPEED,0,PeonyBathBlock.ATTACK_SPEED_MODIFIER_NAME,false,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             PeonyBathBlock.applyAttributeModifier(entity,Attributes.KNOCKBACK_RESISTANCE,0,PeonyBathBlock.KNOCKBACK_RESISTANCE_MODIFIER_NAME,false,AttributeModifier.Operation.ADD_VALUE);

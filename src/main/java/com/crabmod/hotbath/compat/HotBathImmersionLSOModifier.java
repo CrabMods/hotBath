@@ -30,7 +30,7 @@ public class HotBathImmersionLSOModifier {
         UUID playerUUID = player.getUUID();
         // Use isPlayerInHotBath instead of isPlayerInHotBathBlock
         // This will return false for custom fluids with temperature < 35°C
-        boolean isInBath = CustomFluidHandler.isPlayerInHotBath(player);
+        boolean isInBath = com.crabmod.hotbath.api.HotBathApi.allowsModIntegrations(player)&&CustomFluidHandler.isPlayerInHotBath(player);
 
         if (isInBath) {
             int timer = BATH_TIMERS.getOrDefault(playerUUID, 0) + 1;
